@@ -12,7 +12,7 @@ const MedicalNotesModal = ({ patient, onClose }) => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/patients/${patient.id}/notes`);
+        const response = await axios.get(`/api/patients/${patient.id}/notes`);
         setNotes(response.data);
       } catch (err) {
         console.error("Error fetching notes:", err);
@@ -26,13 +26,13 @@ const MedicalNotesModal = ({ patient, onClose }) => {
   const handleSaveNote = async () => {
     if (!newNote.trim()) return;
     try {
-      await axios.post(`http://localhost:5000/api/patients/${patient.id}/notes`, {
+      await axios.post(`/api/patients/${patient.id}/notes`, {
         doctor_name: currentUser?.full_name || 'Attending Doctor',
         note_text: newNote.trim()
       });
       setNewNote('');
       // Refresh notes
-      const response = await axios.get(`http://localhost:5000/api/patients/${patient.id}/notes`);
+      const response = await axios.get(`/api/patients/${patient.id}/notes`);
       setNotes(response.data);
     } catch (err) {
       console.error("Error saving note:", err);

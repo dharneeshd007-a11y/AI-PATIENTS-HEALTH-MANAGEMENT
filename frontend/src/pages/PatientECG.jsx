@@ -11,7 +11,7 @@ const PatientECG = () => {
   useEffect(() => {
     const fetchMyData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/patients/me?name=${user?.full_name}`);
+        const response = await axios.get(`/api/patients/me?name=${user?.full_name}`);
         // Map backend history format to chart format
         const formattedData = response.data.vitalsHistory.map((v, i) => ({
           time: i,

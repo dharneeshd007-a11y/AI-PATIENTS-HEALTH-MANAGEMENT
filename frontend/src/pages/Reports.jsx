@@ -15,8 +15,8 @@ const Reports = () => {
     const fetchData = async () => {
       try {
         const [alertsRes, patientsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/alerts'),
-          axios.get('http://localhost:5000/api/patients')
+          axios.get('/api/alerts'),
+          axios.get('/api/patients')
         ]);
         
         let fetchedReports = alertsRes.data;

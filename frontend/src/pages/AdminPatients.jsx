@@ -13,8 +13,8 @@ const AdminPatients = () => {
   const fetchData = async () => {
     try {
       const [patientsRes, usersRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/patients'),
-        axios.get('http://localhost:5000/api/users')
+        axios.get('/api/patients'),
+        axios.get('/api/users')
       ]);
       setPatients(patientsRes.data);
       setDoctors(usersRes.data.filter(u => u.role === 'Doctor'));
@@ -34,7 +34,7 @@ const AdminPatients = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this patient? All their medical data and alerts will be lost.')) {
       try {
-        await axios.delete(`http://localhost:5000/api/patients/${id}`);
+        await axios.delete(`/api/patients/${id}`);
         fetchData();
       } catch (error) {
         console.error("Error deleting patient:", error);
@@ -46,7 +46,7 @@ const AdminPatients = () => {
   const handleAddPatient = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/patients', formData);
+      await axios.post('/api/patients', formData);
       setShowForm(false);
       setFormData({ name: '', age: '', gender: 'Male', room: '', phone: '', doctor_name: '', status: 'Stable', mrn: '' });
       fetchData();
@@ -59,7 +59,7 @@ const AdminPatients = () => {
   const handleEditSubmit = async (e, id) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/patients/${id}`, formData);
+      await axios.put(`/api/patients/${id}`, formData);
       setEditPatientId(null);
       setFormData({ name: '', age: '', gender: 'Male', room: '', phone: '', doctor_name: '', status: 'Stable', mrn: '' });
       fetchData();

@@ -14,7 +14,7 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/users/${user.id}`, formData);
+      await axios.put(`/api/users/${user.id}`, formData);
       
       // Update local storage so auth state persists
       const currentUserData = authService.getCurrentUser();

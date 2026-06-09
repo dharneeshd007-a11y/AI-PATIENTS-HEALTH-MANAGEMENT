@@ -10,7 +10,7 @@ const PatientAlerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/alerts');
+        const response = await axios.get('/api/alerts');
         // Filter alerts to ONLY show those belonging to this specific patient
         // (In a real production app, this filtering MUST happen securely on the backend)
         const myAlerts = response.data.filter(a => a.patient_name === user?.full_name || a.patient === user?.full_name);

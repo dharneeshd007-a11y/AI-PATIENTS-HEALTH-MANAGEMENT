@@ -16,7 +16,7 @@ const PatientDashboard = () => {
   useEffect(() => {
     const fetchMyData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/patients/me?name=${user?.full_name}`);
+        const response = await axios.get(`/api/patients/me?name=${user?.full_name}`);
         
         // Provide realistic mock data if vitals history is missing
         const data = response.data;
@@ -31,7 +31,7 @@ const PatientDashboard = () => {
         setPatientData(data);
 
         // Fetch alerts
-        const alertsRes = await axios.get('http://localhost:5000/api/alerts');
+        const alertsRes = await axios.get('/api/alerts');
         const myCriticalAlerts = alertsRes.data.filter(a => 
           a.severity === 'Critical' && !a.resolved && 
           (a.patient_name === user?.full_name || a.patient === user?.full_name)

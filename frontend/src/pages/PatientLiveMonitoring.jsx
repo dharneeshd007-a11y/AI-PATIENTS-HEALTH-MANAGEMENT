@@ -13,7 +13,7 @@ const PatientLiveMonitoring = () => {
   useEffect(() => {
     const fetchMyData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/patients/me?name=${user?.full_name}`);
+        const response = await axios.get(`/api/patients/me?name=${user?.full_name}`);
         setPatientData(response.data);
         
         // Initialize chart with historical vitals or random base

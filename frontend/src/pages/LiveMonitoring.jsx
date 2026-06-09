@@ -30,7 +30,7 @@ const LiveMonitoring = () => {
         
         if (!currentPatientId && user?.role === 'Patient') {
           // Auto-detect patient ID for the logged in patient
-          const meRes = await axios.get(`http://localhost:5000/api/patients/me?name=${user?.full_name}`);
+          const meRes = await axios.get(`/api/patients/me?name=${user?.full_name}`);
           if (meRes.data && meRes.data.id) {
             currentPatientId = meRes.data.id.toString();
             setActivePatientId(currentPatientId);
@@ -41,8 +41,8 @@ const LiveMonitoring = () => {
         }
 
         const [patientsRes, alertsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/patients'),
-          axios.get('http://localhost:5000/api/alerts')
+          axios.get('/api/patients'),
+          axios.get('/api/alerts')
         ]);
         
         let fetchedPatients = patientsRes.data;

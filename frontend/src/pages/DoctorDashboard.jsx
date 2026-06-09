@@ -15,8 +15,8 @@ const DoctorDashboard = () => {
     const fetchData = async () => {
       try {
         const [patientsRes, alertsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/patients'),
-          axios.get('http://localhost:5000/api/alerts')
+          axios.get('/api/patients'),
+          axios.get('/api/alerts')
         ]);
         
         const criticalAlerts = alertsRes.data.filter(a => a.severity === 'Critical' && !a.resolved);

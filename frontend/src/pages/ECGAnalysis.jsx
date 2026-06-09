@@ -23,7 +23,7 @@ const ECGAnalysis = () => {
         if (!currentPatientId) {
           if (user?.role === 'Patient') {
             // Auto-detect patient ID for the logged in patient
-            const meRes = await axios.get(`http://localhost:5000/api/patients/me?name=${user?.full_name}`);
+            const meRes = await axios.get(`/api/patients/me?name=${user?.full_name}`);
             if (meRes.data && meRes.data.id) {
               currentPatientId = meRes.data.id.toString();
               setActivePatientId(currentPatientId);
@@ -34,13 +34,13 @@ const ECGAnalysis = () => {
             }
           } else {
             // Admin/Doctor accessed from sidebar -> show list of patients
-            const res = await axios.get('http://localhost:5000/api/patients');
+            const res = await axios.get('/api/patients');
             setAllPatients(res.data);
             return;
           }
         }
         
-        const response = await axios.get(`http://localhost:5000/api/patients/${currentPatientId}`);
+        const response = await axios.get(`/api/patients/${currentPatientId}`);
         setPatientData(response.data);
         
         if (response.data.vitalsHistory && response.data.vitalsHistory.length > 0) {

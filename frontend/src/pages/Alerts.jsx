@@ -8,7 +8,7 @@ const Alerts = () => {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/alerts');
+        const response = await axios.get('/api/alerts');
         setAlerts(response.data);
       } catch (error) {
         console.error("Error fetching alerts:", error);
@@ -19,7 +19,7 @@ const Alerts = () => {
 
   const handleAcknowledge = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/alerts/${id}/resolve`);
+      await axios.put(`/api/alerts/${id}/resolve`);
       setAlerts(alerts.map(a => a.id === id ? { ...a, resolved: 1 } : a));
     } catch (error) {
       console.error("Error acknowledging alert:", error);

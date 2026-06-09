@@ -1,0 +1,61 @@
+# Deployment Guide for AI Patient Monitoring (Live Server)
+
+Your project has been successfully restructured to be "upload-ready". This means your frontend and backend are tightly integrated and can be deployed together as a single Web Service on platforms like Render or Heroku.
+
+Here is the step-by-step process to deploy your application to Render for free.
+
+---
+
+### Step 1: Push your latest changes to GitHub
+Since we made changes to your project, make sure everything is pushed:
+1. Open your terminal in VS Code.
+2. Run `git add .`
+3. Run `git commit -m "Prepare for production"`
+4. Run `git push`
+
+### Step 2: Create a Render Account
+1. Go to [https://render.com/](https://render.com/) and sign up.
+2. We recommend signing in directly with your GitHub account.
+
+### Step 3: Create a New Web Service
+1. On your Render Dashboard, click the **New +** button in the top right corner.
+2. Select **Web Service**.
+3. Choose **Build and deploy from a Git repository**.
+4. Click **Next** and connect your GitHub account if prompted.
+5. Search for your repository `Dharneesh2007/AI-Patient-Monitoring` and click **Connect**.
+
+### Step 4: Configure the Web Service
+Render needs to know how to build and run your app. Fill out the form with these exact details:
+
+- **Name:** ai-patient-monitoring (or anything you like)
+- **Region:** Choose the region closest to you
+- **Branch:** `main`
+- **Root Directory:** (leave blank)
+- **Runtime:** `Node`
+- **Build Command:** `npm run build`
+- **Start Command:** `npm run start`
+
+### Step 5: Setup Environment Variables
+Scroll down to the **Environment Variables** section and add the following:
+
+1. Click **Add Environment Variable**
+   - **Key:** `NODE_ENV`
+   - **Value:** `production`
+
+2. *Important Database Configuration:* 
+   Your application uses a MySQL database. Render does not host MySQL databases directly for free. If you have your MySQL database hosted somewhere else (like Aiven, PlanetScale, or a VPS), add your DB credentials here just like in your `.env` file:
+   - **Key:** `DB_HOST`, **Value:** `<your-remote-db-host>`
+   - **Key:** `DB_USER`, **Value:** `<your-db-username>`
+   - **Key:** `DB_PASSWORD`, **Value:** `<your-db-password>`
+   - **Key:** `DB_NAME`, **Value:** `<your-db-name>`
+
+### Step 6: Deploy!
+1. Scroll to the bottom and click **Create Web Service**.
+2. Render will now automatically download your code, run `npm install` for both frontend and backend, build your Vite frontend, and start your Node.js backend.
+3. You will see a green **"Live"** status when it's done.
+4. Click the URL at the top left of the dashboard (e.g., `https://ai-patient-monitoring.onrender.com`) to view your live app!
+
+---
+
+**Note about Local Development:**
+Whenever you want to test the app locally on your machine, you can still run `npm run dev` in your `frontend` folder, and run your `server.js` in the `backend` folder as usual. The setup we created fully supports both local development and live production!

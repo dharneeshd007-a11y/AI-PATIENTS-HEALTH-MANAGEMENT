@@ -16,9 +16,9 @@ const AdminDashboard = () => {
     const fetchData = async () => {
       try {
         const [usersRes, metricsRes, alertsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/users'),
-          axios.get('http://localhost:5000/api/users/admin/metrics'),
-          axios.get('http://localhost:5000/api/alerts')
+          axios.get('/api/users'),
+          axios.get('/api/users/admin/metrics'),
+          axios.get('/api/alerts')
         ]);
         setUsers(usersRes.data);
         setMetrics(metricsRes.data);
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
                     onClick={async () => {
                       if (window.confirm(`Are you sure you want to remove ${u.full_name}?`)) {
                         try {
-                          await axios.delete(`http://localhost:5000/api/users/${u.id}`);
+                          await axios.delete(`/api/users/${u.id}`);
                           setUsers(users.filter(user => user.id !== u.id));
                         } catch (error) {
                           console.error("Error deleting user:", error);

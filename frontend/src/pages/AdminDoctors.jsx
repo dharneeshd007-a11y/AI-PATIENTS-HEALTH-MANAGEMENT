@@ -8,7 +8,7 @@ const AdminDoctors = () => {
 
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users');
+      const response = await axios.get('/api/users');
       setDoctors(response.data.filter(u => u.role === 'Doctor'));
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -24,7 +24,7 @@ const AdminDoctors = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this doctor?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/users/${id}`);
+        await axios.delete(`/api/users/${id}`);
         fetchDoctors();
       } catch (error) {
         console.error("Error deleting doctor:", error);
@@ -36,7 +36,7 @@ const AdminDoctors = () => {
   const handleEditSubmit = async (e, id) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/users/${id}`, {
+      await axios.put(`/api/users/${id}`, {
         full_name: formData.full_name,
         email: formData.email,
         phone: formData.phone,
@@ -70,7 +70,7 @@ const AdminDoctors = () => {
   const handleAddDoctor = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', formData);
+      await axios.post('/api/auth/register', formData);
       setShowForm(false);
       setFormData({ full_name: '', email: '', phone: '', password: '', role: 'Doctor', badge_id: '' });
       fetchDoctors();
