@@ -11,7 +11,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -43,13 +43,17 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
+// 404 handler specifically for API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({ message: 'API Route Not Found' });
+});
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   const path = require('path');
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
-  });
+  // app.get('*', (req, res) => {
+  //   res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+  // });
 }
 
 // Socket.IO Logic
