@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://Dharneesh2007.github.io/AI-Patient-Monitoring",
+  "homepage": "https://dharneeshd007-a11y.github.io/AI-PATIENTS-HEALTH-MANAGEMENT/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
