@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = import.meta.env.PROD ? window.location.origin : 'http://localhost:5000';
+const URL = 'https://ai-patients-health-management.onrender.com';
 
 class SocketService {
   constructor() {
