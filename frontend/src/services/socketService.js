@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const URL = 'https://ai-patients-health-management.onrender.com';
+const URL = import.meta.env.PROD ? window.location.origin : 'http://localhost:5001';
 
 class SocketService {
   constructor() {
@@ -8,39 +8,20 @@ class SocketService {
   }
 
   connect() {
-    if (!this.socket) {
-      this.socket = io(URL, {
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10
-      });
-
-      this.socket.on('connect', () => {
-        console.log('Connected to KMCH AI backend socket');
-      });
-
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from socket');
-      });
-    }
-    return this.socket;
+    console.log('[Mock Socket] Connected');
+    return this;
   }
 
   disconnect() {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
-    }
+    console.log('[Mock Socket] Disconnected');
   }
 
   on(event, callback) {
-    if (!this.socket) this.connect();
-    this.socket.on(event, callback);
+    console.log(`[Mock Socket] Listening to event: ${event}`);
   }
 
   off(event, callback) {
-    if (!this.socket) return;
-    this.socket.off(event, callback);
+    console.log(`[Mock Socket] Stopped listening to event: ${event}`);
   }
 }
 
