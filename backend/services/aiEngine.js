@@ -43,6 +43,9 @@ class AIEngine {
 
     // Run simulation loop every 200ms
     this.intervalId = setInterval(() => this.tick(), 200);
+
+    // Run 5-minute periodic monitoring check (300000 ms)
+    this.fiveMinuteIntervalId = setInterval(() => this.runFiveMinuteCheck(), 5 * 60 * 1000);
   }
 
   async tick() {
@@ -94,11 +97,8 @@ class AIEngine {
         status: patient.status
       };
 
-      // AI ANOMALY DETECTION (Simulation)
-      // 0.33% chance per tick to generate an alert if patient is currently stable (roughly 1 per minute per patient)
-      if (Math.random() < 0.0033 && patient.status !== 'Critical') {
-        await this.generateAlert(patient, state);
-      }
+    // AI ANOMALY DETECTION (Simulation)
+      // Removed the random tick anomaly detection. We now check every 5 minutes.
     }
 
     // Broadcast the entire batch of updates to all clients
@@ -108,11 +108,31 @@ class AIEngine {
     });
   }
 
+  async runFiveMinuteCheck() {
+    console.log("[AI ENGINE] Running 5-minute periodic monitoring check for all patients...");
+    if (this.patients.length === 0) return;
+
+    for (const patient of this.patients) {
+      const state = this.simulatedDataState[patient.id];
+      if (!state) continue;
+
+      // 5-Minute Evaluation: If they are not critical, there is a chance to detect an anomaly during the check.
+      if (patient.status !== 'Critical') {
+        // Evaluate the vitals. For simulation purposes, we trigger an alert 30% of the time during the 5-min check.
+        if (Math.random() < 0.3) {
+          await this.generateAlert(patient, state);
+        } else {
+          console.log(`[AI ENGINE] Patient ${patient.name} (${patient.id}) checked. Vitals are stable.`);
+        }
+      }
+    }
+  }
+
   async generateAlert(patient, state) {
     try {
       console.log(`[AI ENGINE] Critical anomaly detected for patient ${patient.name} (${patient.id})!`);
 
-      const arrhythmias = ['Atrial Fibrillation', 'Ventricular Tachycardia', 'Bradycardia', 'Premature Ventricular Contractions'];
+      const arrhythmias = ['Atrial Fibrillation', 'Ventricular Tachycardia', 'Bradycardia', 'Premature Ventricular Contractions', '5-Min Check: Abnormal Rhythm'];
       const type = arrhythmias[Math.floor(Math.random() * arrhythmias.length)];
 
       // Force heart rate to match the arrhythmia for realism
@@ -140,7 +160,7 @@ class AIEngine {
         resolved: 0
       };
 
-      // Emit real-time alert event
+      // Emit real-time alert event to doctors and admins
       this.io.emit('new_alert', newAlert);
 
       // Refresh patient list to get the new status
@@ -152,9 +172,8 @@ class AIEngine {
   }
 
   stop() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+    if (this.intervalId) clearInterval(this.intervalId);
+    if (this.fiveMinuteIntervalId) clearInterval(this.fiveMinuteIntervalId);
   }
 }
 
