@@ -99,6 +99,12 @@ router.put('/:id', async (req, res) => {
       [name, age, gender, room, status, mrn, phone || null, doctor_name || null, req.params.id]
     );
 
+    // Automatically sync the phone number update to the user's login account if they have one
+    await db.query(
+      'UPDATE users SET phone = ? WHERE full_name = ? AND role = "Patient"',
+      [phone || null, name]
+    );
+
     if (status === 'Critical') {
       const [existingAlerts] = await db.query(
         'SELECT * FROM alerts WHERE patient_id = ? AND resolved = 0',
