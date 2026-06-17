@@ -8,20 +8,39 @@ class SocketService {
   }
 
   connect() {
-    console.log('[Mock Socket] Connected');
+    if (!this.socket) {
+      this.socket = io(URL, {
+        transports: ['websocket'],
+        reconnection: true
+      });
+      
+      this.socket.on('connect', () => {
+        console.log('[Socket] Connected to Live Server');
+      });
+      
+      this.socket.on('disconnect', () => {
+        console.log('[Socket] Disconnected from Live Server');
+      });
+    }
     return this;
   }
 
   disconnect() {
-    console.log('[Mock Socket] Disconnected');
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
+    }
   }
 
   on(event, callback) {
-    console.log(`[Mock Socket] Listening to event: ${event}`);
+    if (!this.socket) this.connect();
+    this.socket.on(event, callback);
   }
 
   off(event, callback) {
-    console.log(`[Mock Socket] Stopped listening to event: ${event}`);
+    if (this.socket) {
+      this.socket.off(event, callback);
+    }
   }
 }
 
