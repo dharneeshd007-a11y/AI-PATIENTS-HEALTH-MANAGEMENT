@@ -59,10 +59,14 @@ app.get('/api/setup', (req, res) => {
 });
 
 // Test endpoint to trigger the periodic monitor instantly instead of waiting
-app.get('/api/trigger-alert', (req, res) => {
+app.get('/api/trigger-alert', async (req, res) => {
   if (aiEngine) {
-    aiEngine.runFiveMinuteCheck();
-    res.send("Triggered the periodic check instantly! Check your frontend.");
+    try {
+      await aiEngine.runFiveMinuteCheck();
+      res.send("Triggered the periodic check instantly! Check your frontend.");
+    } catch (err) {
+      res.status(500).send("Error running check: " + err.message);
+    }
   } else {
     res.status(500).send("AI Engine not running.");
   }

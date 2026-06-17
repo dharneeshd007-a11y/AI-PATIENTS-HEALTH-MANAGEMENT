@@ -45,8 +45,8 @@ class AIEngine {
     // Run simulation loop every 200ms
     this.intervalId = setInterval(() => this.tick(), 200);
 
-    // Run 5-minute periodic monitoring check (changed to 1 min for easier testing)
-    this.fiveMinuteIntervalId = setInterval(() => this.runFiveMinuteCheck(), 60 * 1000);
+    // Run 2-minute periodic monitoring check as requested by user
+    this.fiveMinuteIntervalId = setInterval(() => this.runFiveMinuteCheck(), 2 * 60 * 1000);
   }
 
   async tick() {
@@ -162,8 +162,11 @@ class AIEngine {
       // Emit real-time alert event to doctors and admins
       this.io.emit('new_alert', newAlert);
 
-      // Refresh patient list to get the new status
-      this.fetchActivePatients();
+      // Refresh patient list to get the new status locally (let the 2-second interval sync the DB later)
+      const patientIndex = this.patients.findIndex(p => p.id === patient.id);
+      if (patientIndex !== -1) {
+        this.patients[patientIndex].status = 'Critical';
+      }
 
     } catch (err) {
       console.error("AI Engine: Failed to generate alert", err);
