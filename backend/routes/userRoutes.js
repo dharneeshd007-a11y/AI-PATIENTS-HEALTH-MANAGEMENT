@@ -42,7 +42,7 @@ router.delete('/:id', async (req, res) => {
       const { role, full_name } = existingUsers[0];
       if (role === 'Doctor') {
         // Update patients assigned to this doctor to 'Pending Assignment'
-        await db.query('UPDATE patients SET doctor_name = "Pending Assignment" WHERE doctor_name = ?', [full_name]);
+        await db.query("UPDATE patients SET doctor_name = 'Pending Assignment' WHERE doctor_name = ?", [full_name]);
       }
     }
 
