@@ -170,6 +170,7 @@ class AIEngine {
 
     } catch (err) {
       console.error("AI Engine: Failed to generate alert", err);
+      throw err;
     }
   }
 
