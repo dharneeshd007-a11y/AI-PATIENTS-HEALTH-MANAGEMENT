@@ -18,7 +18,8 @@ class AIEngine {
         if (!this.simulatedDataState[p.id]) {
           this.simulatedDataState[p.id] = {
             baseHeartRate: p.hr || 70,
-            baseSpO2: p.spo2 || 98
+            baseSpO2: p.spo2 || 98,
+            phaseOffset: Math.random()
           };
         } else {
           // If the doctor resolved the alert and marked them Stable, normalize their heart rate
@@ -72,7 +73,7 @@ class AIEngine {
       // Calculate where we are in the beat cycle based on HR
       const beatInterval = 60000 / state.baseHeartRate; // ms per beat
       const ticksPerBeat = beatInterval / 200; // 200ms per tick
-      const phase = (this.timeCounter % ticksPerBeat) / ticksPerBeat;
+      const phase = ((this.timeCounter / ticksPerBeat) + (state.phaseOffset || 0)) % 1;
 
       // R-peak (sharp spike)
       if (phase > 0.45 && phase < 0.55) {
