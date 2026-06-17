@@ -19,7 +19,7 @@ const PatientLiveMonitoring = () => {
         // Initialize chart with historical vitals or random base
         const baseData = Array.from({ length: 50 }, (_, i) => ({
           time: i,
-          value: Math.sin(i * 0.5) * 10 + (Math.random() * 5) + (response.data.vitalsHistory[0]?.heart_rate || 70)
+          value: Math.sin(i * 0.5) * 10 + (Math.random() * 5) + 50
         }));
         setChartData(baseData);
       } catch (err) {

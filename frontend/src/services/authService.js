@@ -19,8 +19,16 @@ const logout = () => {
   localStorage.removeItem('user');
 };
 
+let cachedUserStr = null;
+let cachedUserObj = null;
+
 const getCurrentUser = () => {
-  return JSON.parse(localStorage.getItem('user'));
+  const userStr = localStorage.getItem('user');
+  if (userStr !== cachedUserStr) {
+    cachedUserStr = userStr;
+    cachedUserObj = userStr ? JSON.parse(userStr) : null;
+  }
+  return cachedUserObj;
 };
 
 const authService = {

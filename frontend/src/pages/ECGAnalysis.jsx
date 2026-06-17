@@ -16,6 +16,10 @@ const ECGAnalysis = () => {
   const [allPatients, setAllPatients] = useState([]);
 
   useEffect(() => {
+    setActivePatientId(searchParams.get('patientId'));
+  }, [searchParams]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         let currentPatientId = activePatientId;

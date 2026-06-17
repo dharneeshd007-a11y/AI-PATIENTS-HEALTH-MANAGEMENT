@@ -13,18 +13,24 @@ const PatientECG = () => {
       try {
         const response = await axios.get(`/api/patients/me?name=${user?.full_name}`);
         // Map backend history format to chart format
-        const formattedData = response.data.vitalsHistory.map((v, i) => ({
+        const formattedData = (response.data.vitalsHistory || []).map((v, i) => ({
           time: i,
           value: v.heart_rate + (Math.random() * 2 - 1)
         }));
-        const realisticMockData = Array.from({ length: 150 }, (_, i) => ({
-          time: i,
-          value: 70 + 
-                 (i % 30 === 0 ? 30 : 0) + 
-                 (i % 30 === 1 ? -15 : 0) + 
-                 (i % 30 === 28 ? 10 : 0) + 
-                 (Math.random() * 4 - 2)
-        }));
+        
+        const isCritical = response.data.status === 'Critical';
+        const baseHR = isCritical ? 135 : 72;
+        const noise = isCritical ? 12 : 3;
+        const frequency = isCritical ? 0.25 : 0.1;
+        
+        const realisticMockData = Array.from({ length: 200 }, (_, i) => {
+          const phase = parseInt(response.data.id) || 0;
+          return {
+            time: i,
+            value: Math.sin((i + phase) * frequency) * 15 + (Math.random() * noise) + baseHR
+          };
+        });
+        
         setVitalsHistory(formattedData.length > 0 ? formattedData : realisticMockData);
       } catch (err) {
         console.error(err);

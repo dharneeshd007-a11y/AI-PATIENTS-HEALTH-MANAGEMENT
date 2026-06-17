@@ -47,6 +47,25 @@ axios.defaults.adapter = async function (config) {
     return mockResponse(201, { message: 'User registered successfully', userId: 2 });
   }
 
+  // Mock Patient Me
+  if (url.includes('/api/patients/me')) {
+    const urlParams = new URLSearchParams(url.split('?')[1]);
+    const name = urlParams.get('name') || 'John Doe';
+    return mockResponse(200, {
+      id: 1, 
+      mrn: 'PT-1001', 
+      name: name, 
+      age: 65, 
+      gender: 'Male', 
+      room: 'ICU-101', 
+      status: 'Critical', 
+      phone: '1234567890',
+      vitalsHistory: [
+        { heart_rate: 80, spo2: 98, blood_pressure: '120/80' }
+      ]
+    });
+  }
+
   // Mock Patients
   if (url.includes('/api/patients')) {
     if (url.includes('/notes')) {
