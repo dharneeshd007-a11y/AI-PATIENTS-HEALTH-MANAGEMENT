@@ -4,14 +4,21 @@ const mysql = require('mysql2/promise');
 async function migrate() {
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    ssl: process.env.DB_HOST !== 'localhost' ? { rejectUnauthorized: false } : undefined
   });
 
   try {
-    console.log("Adding mrn to patients table...");
-    await connection.query('ALTER TABLE patients ADD COLUMN mrn VARCHAR(50) DEFAULT NULL');
+    try {
+      console.log("Adding mrn to patients table...");
+      await connection.query('ALTER TABLE patients ADD COLUMN mrn VARCHAR(50) DEFAULT NULL');
+    } catch (e) {
+      if (e.code !== 'ER_DUP_FIELDNAME') throw e;
+      console.log("mrn column already exists.");
+    }
     
     // Auto-generate some MRNs for existing patients
     const [patients] = await connection.query('SELECT id FROM patients');
@@ -20,8 +27,13 @@ async function migrate() {
     }
     console.log("Patients updated.");
 
-    console.log("Adding badge_id to users table...");
-    await connection.query('ALTER TABLE users ADD COLUMN badge_id VARCHAR(50) DEFAULT NULL');
+    try {
+      console.log("Adding badge_id to users table...");
+      await connection.query('ALTER TABLE users ADD COLUMN badge_id VARCHAR(50) DEFAULT NULL');
+    } catch (e) {
+      if (e.code !== 'ER_DUP_FIELDNAME') throw e;
+      console.log("badge_id column already exists.");
+    }
     
     // Auto-generate some Badge IDs for existing users
     const [users] = await connection.query('SELECT id, role FROM users');
