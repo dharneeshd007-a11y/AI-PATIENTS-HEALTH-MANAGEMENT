@@ -45,8 +45,8 @@ class AIEngine {
     // Run simulation loop every 200ms
     this.intervalId = setInterval(() => this.tick(), 200);
 
-    // Run 5-minute periodic monitoring check (300000 ms)
-    this.fiveMinuteIntervalId = setInterval(() => this.runFiveMinuteCheck(), 5 * 60 * 1000);
+    // Run 5-minute periodic monitoring check (changed to 1 min for easier testing)
+    this.fiveMinuteIntervalId = setInterval(() => this.runFiveMinuteCheck(), 60 * 1000);
   }
 
   async tick() {

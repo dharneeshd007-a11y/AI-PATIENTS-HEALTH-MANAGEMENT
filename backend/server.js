@@ -58,6 +58,16 @@ app.get('/api/setup', (req, res) => {
   }
 });
 
+// Test endpoint to trigger the periodic monitor instantly instead of waiting
+app.get('/api/trigger-alert', (req, res) => {
+  if (aiEngine) {
+    aiEngine.runFiveMinuteCheck();
+    res.send("Triggered the periodic check instantly! Check your frontend.");
+  } else {
+    res.status(500).send("AI Engine not running.");
+  }
+});
+
 app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API Route Not Found' });
 });
