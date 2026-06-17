@@ -117,14 +117,12 @@ class AIEngine {
       const state = this.simulatedDataState[patient.id];
       if (!state) continue;
 
-      // 5-Minute Evaluation: If they are not critical, there is a chance to detect an anomaly during the check.
+      // 5-Minute Evaluation:
       if (patient.status !== 'Critical') {
-        // Evaluate the vitals. For simulation purposes, we trigger an alert 30% of the time during the 5-min check.
-        if (Math.random() < 0.3) {
-          await this.generateAlert(patient, state);
-        } else {
-          console.log(`[AI ENGINE] Patient ${patient.name} (${patient.id}) checked. Vitals are stable.`);
-        }
+        // We will trigger an alert 100% of the time during the 5-min check so you can visibly see it working.
+        await this.generateAlert(patient, state);
+      } else {
+        console.log(`[AI ENGINE] Patient ${patient.name} (${patient.id}) is already Critical. Skipping new alert.`);
       }
     }
   }
