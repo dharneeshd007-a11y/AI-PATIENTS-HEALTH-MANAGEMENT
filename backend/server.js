@@ -44,6 +44,20 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
 // 404 handler specifically for API routes
+app.get('/api/setup', (req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    const out1 = execSync('node scripts/init-db.js', {cwd: __dirname}).toString();
+    const out2 = execSync('node scripts/update-db.js', {cwd: __dirname}).toString();
+    const out3 = execSync('node scripts/create-notes-table.js', {cwd: __dirname}).toString();
+    const out4 = execSync('node migrate.js', {cwd: __dirname}).toString();
+    const out5 = execSync('node reset-admin.js', {cwd: __dirname}).toString();
+    res.send(`<pre>${out1}\n${out2}\n${out3}\n${out4}\n${out5}</pre>`);
+  } catch (err) {
+    res.status(500).send(`<pre>Error: ${err.message}\nOutput: ${err.stdout ? err.stdout.toString() : ''}\nStderr: ${err.stderr ? err.stderr.toString() : ''}</pre>`);
+  }
+});
+
 app.use('/api', (req, res) => {
   res.status(404).json({ message: 'API Route Not Found' });
 });
