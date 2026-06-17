@@ -101,7 +101,7 @@ router.put('/:id', async (req, res) => {
 
     // Automatically sync the phone number update to the user's login account if they have one
     await db.query(
-      'UPDATE users SET phone = ? WHERE full_name = ? AND role = "Patient"',
+      "UPDATE users SET phone = ? WHERE full_name = ? AND role = 'Patient'",
       [phone || null, name]
     );
 
