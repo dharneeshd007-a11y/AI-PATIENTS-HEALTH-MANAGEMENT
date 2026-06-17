@@ -55,12 +55,12 @@ exports.loginUser = async (req, res) => {
 
   try {
     const [users] = await db.query(
-      'SELECT * FROM users WHERE email = ? AND full_name = ? AND role = ?', 
-      [email, full_name, role]
+      'SELECT * FROM users WHERE email = ? AND full_name = ? AND role = ? AND phone = ?', 
+      [email, full_name, role, phone]
     );
     
     if (users.length === 0) {
-      return res.status(401).json({ message: 'Invalid credentials or role' });
+      return res.status(401).json({ message: 'Invalid credentials. Please ensure Name, Phone, Email, and Role are exactly correct.' });
     }
 
     const user = users[0];
