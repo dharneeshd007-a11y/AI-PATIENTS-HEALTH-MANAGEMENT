@@ -10,7 +10,7 @@ class AIEngine {
 
   async fetchActivePatients() {
     try {
-      const [rows] = await this.db.query('SELECT * FROM patients WHERE status != "Discharged"');
+      const [rows] = await this.db.query("SELECT * FROM patients WHERE status != 'Discharged'");
       this.patients = rows;
 
       // Initialize state for any new patients
