@@ -6,8 +6,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
-    full_name: '',
-    phone: '',
     password: '',
     role: 'Doctor'
   });
@@ -54,30 +52,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Username</label>
-            <input 
-              type="text" 
-              name="full_name" 
-              required 
-              value={formData.full_name} 
-              onChange={handleChange} 
-              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
-            />
-          </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Phone Number</label>
-            <input 
-              type="tel" 
-              name="phone" 
-              required
-              value={formData.phone} 
-              onChange={handleChange} 
-              placeholder="+1 (555) 000-0000"
-              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
-            />
-          </div>
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Email</label>
