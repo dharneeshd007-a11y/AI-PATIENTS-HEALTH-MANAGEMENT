@@ -1,0 +1,57 @@
+const express = require('express');
+const router = express.Router();
+const mysql = require('mysql2/promise');
+
+// Note: Replace with actual DB connection pool from your project's db config
+// Assuming a db.js or similar exists, but using a generic pool structure for now
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  ssl: process.env.DB_HOST !== 'localhost' ? { rejectUnauthorized: false } : undefined
+});
+
+// Book an appointment (Patient)
+router.post('/book', async (req, res) => {
+    try {
+        const { patient_id, doctor_id, appointment_date, reason } = req.body;
+        const [result] = await pool.query(
+            'INSERT INTO appointments (patient_id, doctor_id, appointment_date, reason) VALUES (?, ?, ?, ?)',
+            [patient_id, doctor_id, appointment_date, reason]
+        );
+        res.status(201).json({ message: 'Appointment booked successfully', id: result.insertId });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to book appointment' });
+    }
+});
+
+// Get appointments for a specific user (Doctor or Patient)
+router.get('/:userId/:role', async (req, res) => {
+    try {
+        const { userId, role } = req.params;
+        let query = '';
+        if (role === 'Doctor') query = 'SELECT * FROM appointments WHERE doctor_id = ?';
+        else if (role === 'Patient') query = 'SELECT * FROM appointments WHERE patient_id = ?';
+        else return res.status(403).json({ error: 'Invalid role' });
+
+        const [appointments] = await pool.query(query, [userId]);
+        res.status(200).json(appointments);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch appointments' });
+    }
+});
+
+// Update appointment status (Doctor)
+router.put('/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'Approved', 'Rejected', 'Completed'
+        await pool.query('UPDATE appointments SET status = ? WHERE id = ?', [status, id]);
+        res.status(200).json({ message: 'Appointment status updated' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update status' });
+    }
+});
+
+module.exports = router;

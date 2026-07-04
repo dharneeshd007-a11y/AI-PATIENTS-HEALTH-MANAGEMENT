@@ -151,6 +151,7 @@ const PatientDashboard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button className="btn btn-primary" onClick={() => navigate(`/live-monitoring?patientId=${patientData.id}`)} style={{ padding: '1rem' }}>Enter Live Monitoring</button>
             <button className="btn btn-outline" onClick={() => navigate(`/ecg-analysis?patientId=${patientData.id}`)} style={{ padding: '1rem' }}>View ECG Report</button>
+            <button className="btn btn-outline" onClick={() => navigate(`/generate-pdf?patientId=${patientData.id}`)} style={{ padding: '1rem', border: '1px solid #3b82f6', color: '#3b82f6' }}>Generate PDF Medical Report</button>
           </div>
         </div>
       )}

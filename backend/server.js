@@ -37,11 +37,20 @@ const patientRoutes = require('./routes/patientRoutes');
 const alertRoutes = require('./routes/alertRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const appointmentRoutes = require('./routes/appointmentRoutes');
+const medicationRoutes = require('./routes/medicationRoutes');
+const emergencyRoutes = require('./routes/emergencyRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+
 app.use('/api', indexRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/medications', medicationRoutes);
+app.use('/api/emergency', emergencyRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler specifically for API routes
 app.get('/api/setup', (req, res) => {

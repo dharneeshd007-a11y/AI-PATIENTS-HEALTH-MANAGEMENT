@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Activity, Users, AlertTriangle, Settings, FileText, UserPlus, HeartPulse, User, Eye, Monitor } from 'lucide-react';
+import { Activity, Users, AlertTriangle, Settings, FileText, UserPlus, HeartPulse, User, Eye, Monitor, Calendar, Pill, TrendingUp, AlertCircle, Bot } from 'lucide-react';
 import authService from '../services/authService';
 
 const Sidebar = () => {
@@ -52,6 +52,9 @@ const Sidebar = () => {
 
         {userRole === 'Admin' && (
           <>
+            <NavLink to="/analytics" style={navLinkStyle}>
+              <TrendingUp size={20} /> Analytics
+            </NavLink>
             <NavLink to="/admin-doctors" style={navLinkStyle}>
               <UserPlus size={20} /> Doctors
             </NavLink>
@@ -63,6 +66,9 @@ const Sidebar = () => {
 
         {userRole === 'Doctor' && (
           <>
+            <NavLink to="/appointments" style={navLinkStyle}>
+              <Calendar size={20} /> Appointments
+            </NavLink>
             <NavLink to="/doctor-patients" style={navLinkStyle}>
               <HeartPulse size={20} /> My Patients
             </NavLink>
@@ -72,11 +78,23 @@ const Sidebar = () => {
             <NavLink to="/ecg-analysis" style={navLinkStyle}>
               <Eye size={20} /> ECG Analysis
             </NavLink>
+            <NavLink to="/ai-assistant" style={navLinkStyle}>
+              <Bot size={20} /> AI Assistant
+            </NavLink>
           </>
         )}
 
         {userRole === 'Patient' && (
           <>
+            <NavLink to="/emergency-sos" style={navLinkStyle}>
+              <AlertCircle size={20} color="#ef4444" /> Emergency SOS
+            </NavLink>
+            <NavLink to="/appointments" style={navLinkStyle}>
+              <Calendar size={20} /> Appointments
+            </NavLink>
+            <NavLink to="/medications" style={navLinkStyle}>
+              <Pill size={20} /> Medications
+            </NavLink>
             <NavLink to="/my-health" style={navLinkStyle}>
               <User size={20} /> My Health
             </NavLink>
@@ -85,6 +103,9 @@ const Sidebar = () => {
             </NavLink>
             <NavLink to="/ecg-analysis" style={navLinkStyle}>
               <Eye size={20} /> ECG Report
+            </NavLink>
+            <NavLink to="/ai-assistant" style={navLinkStyle}>
+              <Bot size={20} /> AI Assistant
             </NavLink>
             <NavLink to="/patient-alerts" style={navLinkStyle}>
               <AlertTriangle size={20} /> Alert History

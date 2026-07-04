@@ -20,6 +20,12 @@ import PatientAlerts from './pages/PatientAlerts';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import Appointments from './pages/Appointments';
+import Medications from './pages/Medications';
+import EmergencySOS from './pages/EmergencySOS';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import AIHealthAssistant from './pages/AIHealthAssistant';
+import PDFReportGenerator from './pages/PDFReportGenerator';
 import authService from './services/authService';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -129,6 +135,42 @@ function App() {
       <Route path="/profile" element={
         <ProtectedRoute allowedRoles={['Admin', 'Doctor', 'Patient']}>
           <AppLayout><Profile /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/appointments" element={
+        <ProtectedRoute allowedRoles={['Doctor', 'Patient']}>
+          <AppLayout><Appointments /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/medications" element={
+        <ProtectedRoute allowedRoles={['Patient']}>
+          <AppLayout><Medications /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/emergency-sos" element={
+        <ProtectedRoute allowedRoles={['Patient']}>
+          <AppLayout><EmergencySOS /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/analytics" element={
+        <ProtectedRoute allowedRoles={['Admin']}>
+          <AppLayout><AnalyticsDashboard /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/ai-assistant" element={
+        <ProtectedRoute allowedRoles={['Patient', 'Doctor']}>
+          <AppLayout><AIHealthAssistant /></AppLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/generate-pdf" element={
+        <ProtectedRoute allowedRoles={['Admin', 'Doctor', 'Patient']}>
+          <AppLayout><PDFReportGenerator /></AppLayout>
         </ProtectedRoute>
       } />
 
