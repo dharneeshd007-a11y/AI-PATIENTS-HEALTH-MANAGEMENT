@@ -91,13 +91,13 @@ router.post('/medication-history', async (req, res) => {
 router.get('/medication-history/:patient_id', async (req, res) => {
     try {
         const { patient_id } = req.params;
-        const [history] = await pool.query(\`
+        const [history] = await pool.query(`
             SELECT mh.*, p.medicine_name, p.dosage 
             FROM medication_history mh
             JOIN prescriptions p ON mh.prescription_id = p.id
             WHERE mh.patient_id = ?
             ORDER BY mh.created_at DESC
-        \`, [patient_id]);
+        `, [patient_id]);
         res.status(200).json(history);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch history' });
