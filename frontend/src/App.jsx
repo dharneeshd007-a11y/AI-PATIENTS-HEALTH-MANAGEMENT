@@ -1,6 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
+import FloatingChatbot from './components/FloatingChatbot';
+import MedicationReminder from './components/MedicationReminder';
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
 import Login from './pages/Login';
@@ -24,7 +26,6 @@ import Appointments from './pages/Appointments';
 import Medications from './pages/Medications';
 import EmergencySOS from './pages/EmergencySOS';
 import AnalyticsDashboard from './pages/AnalyticsDashboard';
-import AIHealthAssistant from './pages/AIHealthAssistant';
 import PDFReportGenerator from './pages/PDFReportGenerator';
 import authService from './services/authService';
 
@@ -42,14 +43,22 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 };
 
 // Layout with Sidebar
-const AppLayout = ({ children }) => (
-  <div className="app-container">
-    <Sidebar />
-    <main className="main-content">
-      {children}
-    </main>
-  </div>
-);
+const AppLayout = ({ children }) => {
+  const userStr = localStorage.getItem('user');
+  const userObj = userStr ? JSON.parse(userStr) : null;
+  const showChatbot = userObj?.user?.role === 'Patient' || userObj?.user?.role === 'Doctor';
+
+  return (
+    <div className="app-container">
+      <Sidebar />
+      <main className="main-content">
+        {children}
+      </main>
+      {showChatbot && <FloatingChatbot />}
+      <MedicationReminder />
+    </div>
+  );
+};
 
 function App() {
   return (
@@ -162,11 +171,7 @@ function App() {
         </ProtectedRoute>
       } />
 
-      <Route path="/ai-assistant" element={
-        <ProtectedRoute allowedRoles={['Patient', 'Doctor']}>
-          <AppLayout><AIHealthAssistant /></AppLayout>
-        </ProtectedRoute>
-      } />
+
 
       <Route path="/generate-pdf" element={
         <ProtectedRoute allowedRoles={['Admin', 'Doctor', 'Patient']}>

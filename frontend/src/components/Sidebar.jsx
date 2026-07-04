@@ -78,9 +78,6 @@ const Sidebar = () => {
             <NavLink to="/ecg-analysis" style={navLinkStyle}>
               <Eye size={20} /> ECG Analysis
             </NavLink>
-            <NavLink to="/ai-assistant" style={navLinkStyle}>
-              <Bot size={20} /> AI Assistant
-            </NavLink>
           </>
         )}
 
@@ -103,9 +100,6 @@ const Sidebar = () => {
             </NavLink>
             <NavLink to="/ecg-analysis" style={navLinkStyle}>
               <Eye size={20} /> ECG Report
-            </NavLink>
-            <NavLink to="/ai-assistant" style={navLinkStyle}>
-              <Bot size={20} /> AI Assistant
             </NavLink>
             <NavLink to="/patient-alerts" style={navLinkStyle}>
               <AlertTriangle size={20} /> Alert History
