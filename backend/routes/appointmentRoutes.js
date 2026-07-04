@@ -26,6 +26,16 @@ router.post('/book', async (req, res) => {
     }
 });
 
+// Get all appointments (Admin)
+router.get('/', async (req, res) => {
+    try {
+        const [appointments] = await pool.query('SELECT * FROM appointments');
+        res.status(200).json(appointments);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch appointments' });
+    }
+});
+
 // Get appointments for a specific user (Doctor or Patient)
 router.get('/:userId/:role', async (req, res) => {
     try {
@@ -42,11 +52,35 @@ router.get('/:userId/:role', async (req, res) => {
     }
 });
 
-// Update appointment status (Doctor)
+// PUT /api/appointments/:id/approve
+router.put('/:id/approve', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { appointment_time } = req.body;
+        await pool.query('UPDATE appointments SET status = ?, appointment_time = ? WHERE id = ?', ['Approved', appointment_time, id]);
+        res.status(200).json({ message: 'Appointment approved' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to approve' });
+    }
+});
+
+// PUT /api/appointments/:id/reject
+router.put('/:id/reject', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rejection_reason } = req.body;
+        await pool.query('UPDATE appointments SET status = ?, rejection_reason = ? WHERE id = ?', ['Rejected', rejection_reason, id]);
+        res.status(200).json({ message: 'Appointment rejected' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to reject' });
+    }
+});
+
+// Update appointment status (General, for Admin or others)
 router.put('/:id/status', async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'Approved', 'Rejected', 'Completed'
+        const { status } = req.body;
         await pool.query('UPDATE appointments SET status = ? WHERE id = ?', [status, id]);
         res.status(200).json({ message: 'Appointment status updated' });
     } catch (error) {

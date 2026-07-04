@@ -55,6 +55,29 @@ const Login = () => {
 
 
           <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Full Name</label>
+            <input 
+              type="text" 
+              name="full_name" 
+              required 
+              value={formData.full_name || ''} 
+              onChange={handleChange} 
+              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Phone Number</label>
+            <input 
+              type="tel" 
+              name="phone" 
+              value={formData.phone || ''} 
+              onChange={handleChange} 
+              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+            />
+          </div>
+
+          <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Email</label>
             <input 
               type="email" 
