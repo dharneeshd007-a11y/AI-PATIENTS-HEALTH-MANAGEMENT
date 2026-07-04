@@ -61,7 +61,8 @@ app.get('/api/setup', (req, res) => {
     const out3 = execSync('node scripts/create-notes-table.js', {cwd: __dirname}).toString();
     const out4 = execSync('node migrate.js', {cwd: __dirname}).toString();
     const out5 = execSync('node reset-admin.js', {cwd: __dirname}).toString();
-    res.send(`<pre>${out1}\n${out2}\n${out3}\n${out4}\n${out5}</pre>`);
+    const out6 = execSync('node scripts/alter-medications.js', {cwd: __dirname}).toString();
+    res.send(`<pre>${out1}\n${out2}\n${out3}\n${out4}\n${out5}\n${out6}</pre>`);
   } catch (err) {
     res.status(500).send(`<pre>Error: ${err.message}\nOutput: ${err.stdout ? err.stdout.toString() : ''}\nStderr: ${err.stderr ? err.stderr.toString() : ''}</pre>`);
   }
