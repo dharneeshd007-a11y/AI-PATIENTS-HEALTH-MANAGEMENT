@@ -15,13 +15,18 @@ const pool = mysql.createPool({
 // Add a new prescription (Doctor)
 router.post('/prescriptions', async (req, res) => {
     try {
-        const { patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions } = req.body;
+        let { patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions } = req.body;
+        
+        start_date = start_date || null;
+        end_date = end_date || null;
+
         const [result] = await pool.query(
             'INSERT INTO prescriptions (patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions]
         );
         res.status(201).json({ message: 'Prescription added successfully', id: result.insertId });
     } catch (error) {
+        console.error('Failed to add prescription', error);
         res.status(500).json({ error: 'Failed to add prescription' });
     }
 });

@@ -72,6 +72,9 @@ const Sidebar = () => {
             <NavLink to="/doctor-patients" style={navLinkStyle}>
               <HeartPulse size={20} /> My Patients
             </NavLink>
+            <NavLink to="/medications" style={navLinkStyle}>
+              <Pill size={20} /> Medications
+            </NavLink>
             <NavLink to="/live-monitoring" style={navLinkStyle}>
               <Monitor size={20} /> Live Monitoring
             </NavLink>
