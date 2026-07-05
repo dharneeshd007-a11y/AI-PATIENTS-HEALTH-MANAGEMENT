@@ -21,6 +21,8 @@ const io = new Server(server, {
   }
 });
 
+app.set('io', io); // Make io accessible in routes
+
 // Middleware
 app.use(cors());
 app.use(express.json());

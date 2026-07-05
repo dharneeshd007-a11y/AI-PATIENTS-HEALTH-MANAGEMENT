@@ -20,6 +20,18 @@ router.post('/sos', async (req, res) => {
             'INSERT INTO audit_logs (user_id, action, details) VALUES (?, ?, ?)',
             [patient_id, 'EMERGENCY_SOS_TRIGGERED', JSON.stringify({ location, message })]
         );
+
+        // Emit socket event for real-time notification
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('emergency_sos', {
+                patient_id,
+                location,
+                message,
+                timestamp: new Date().toISOString()
+            });
+        }
+
         res.status(201).json({ message: 'Emergency SOS triggered successfully', id: result.insertId });
     } catch (error) {
         res.status(500).json({ error: 'Failed to trigger SOS' });

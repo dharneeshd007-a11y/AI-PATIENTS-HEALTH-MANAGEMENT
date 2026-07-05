@@ -24,6 +24,18 @@ router.post('/prescriptions', async (req, res) => {
             'INSERT INTO prescriptions (patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [patient_id, doctor_id, medicine_name, dosage, frequency, reminder_time, start_date, end_date, instructions]
         );
+
+        // Emit socket event for real-time notification
+        const io = req.app.get('io');
+        if (io) {
+            io.emit('new_prescription', {
+                patient_id,
+                medicine_name,
+                doctor_id,
+                timestamp: new Date().toISOString()
+            });
+        }
+
         res.status(201).json({ message: 'Prescription added successfully', id: result.insertId });
     } catch (error) {
         console.error('Failed to add prescription', error);

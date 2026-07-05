@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import FloatingChatbot from './components/FloatingChatbot';
 import MedicationReminder from './components/MedicationReminder';
+import GlobalNotifications from './components/GlobalNotifications';
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
 import Login from './pages/Login';
@@ -56,6 +57,7 @@ const AppLayout = ({ children }) => {
       </main>
       {showChatbot && <FloatingChatbot />}
       <MedicationReminder />
+      <GlobalNotifications />
     </div>
   );
 };
