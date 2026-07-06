@@ -5,6 +5,7 @@ import { Calendar, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionModal, setActionModal] = useState(null); // { type: 'Approve'|'Reject', id: number }
   const [actionInput, setActionInput] = useState(''); // time or reason
@@ -19,7 +20,18 @@ const Appointments = () => {
 
   useEffect(() => {
     fetchAppointments();
+    if (isPatient) fetchDoctors();
   }, [user]);
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await axios.get('/api/users');
+      const docs = res.data.filter(u => u.role === 'Doctor');
+      setDoctors(docs);
+    } catch (error) {
+      console.error('Failed to fetch doctors', error);
+    }
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -40,10 +52,15 @@ const Appointments = () => {
     e.preventDefault();
     const date = e.target.date.value;
     const reason = e.target.reason.value;
-    const doctor_id = 2; // Default mock doctor
+    const doctor_id = e.target.doctor_id.value;
 
     if (!user || !user.id) {
       alert("Please login to book an appointment");
+      return;
+    }
+
+    if (!doctor_id) {
+      alert("Please select a doctor");
       return;
     }
 
@@ -112,6 +129,12 @@ const Appointments = () => {
             Select a preferred date and provide a reason. The doctor will assign a specific time after reviewing your request.
           </p>
           <form onSubmit={handleBook} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <select name="doctor_id" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}>
+              <option value="" style={{color:'black'}}>Select a Doctor</option>
+              {doctors.map(doc => (
+                <option key={doc.id} value={doc.id} style={{color:'black'}}>Dr. {doc.full_name}</option>
+              ))}
+            </select>
             <input type="date" name="date" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
             <input type="text" name="reason" placeholder="Reason for visit..." required style={{ flex: 1, minWidth: '200px', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
             <button type="submit" className="btn btn-primary"><Plus size={18} style={{ verticalAlign: 'middle' }} /> Book</button>
