@@ -96,4 +96,38 @@ router.put('/:id/status', async (req, res) => {
     }
 });
 
+// Delete appointment with role-based validation
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role, userId } = req.query;
+        
+        const [apt] = await pool.query('SELECT status, patient_id FROM appointments WHERE id = ?', [id]);
+        if (apt.length === 0) return res.status(404).json({ error: 'Appointment not found' });
+        
+        const status = apt[0].status;
+        const patient_id = apt[0].patient_id;
+
+        if (status === 'Pending') {
+            if (role === 'Patient' && parseInt(userId) !== patient_id) {
+                return res.status(403).json({ error: 'Unauthorized: Cannot delete other patients\' appointments' });
+            }
+        } else if (status === 'Approved') {
+            if (role !== 'Admin') {
+                return res.status(403).json({ error: 'Unauthorized: Only Admins can delete approved appointments' });
+            }
+        } else {
+            if (role !== 'Admin') {
+                return res.status(403).json({ error: 'Unauthorized: Cannot delete this appointment' });
+            }
+        }
+
+        await pool.query('DELETE FROM appointments WHERE id = ?', [id]);
+        res.status(200).json({ message: 'Appointment deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting appointment:', error);
+        res.status(500).json({ error: 'Failed to delete appointment' });
+    }
+});
+
 module.exports = router;

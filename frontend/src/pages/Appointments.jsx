@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import authService from '../services/authService';
-import { Calendar, Plus, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Calendar, Plus, CheckCircle, XCircle, Clock, Trash2 } from 'lucide-react';
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -98,6 +98,19 @@ const Appointments = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this appointment?")) {
+      try {
+        await axios.delete(`/api/appointments/${id}?role=${user.role}&userId=${user.id}`);
+        alert("Appointment deleted successfully!");
+        fetchAppointments();
+      } catch (error) {
+        console.error('Failed to delete appointment', error);
+        alert(error.response?.data?.error || "Failed to delete appointment");
+      }
+    }
+  };
+
   const getStatusBadge = (status) => {
     const styles = {
       Approved: { bg: 'rgba(34, 197, 94, 0.2)', color: '#4ade80' },
@@ -168,7 +181,7 @@ const Appointments = () => {
                   {(isAdmin || isPatient) && <th style={{ padding: '1rem' }}>Doctor Name</th>}
                   <th style={{ padding: '1rem' }}>Reason</th>
                   <th style={{ padding: '1rem' }}>Status</th>
-                  {isDoctor && <th style={{ padding: '1rem' }}>Actions</th>}
+                  <th style={{ padding: '1rem' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,16 +207,19 @@ const Appointments = () => {
                         )}
                       </td>
                       <td style={{ padding: '1rem' }}>{getStatusBadge(apt.status)}</td>
-                      {isDoctor && (
-                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
-                          {apt.status === 'Pending' && (
-                            <>
-                              <button onClick={() => setActionModal({ type: 'Approve', id: apt.id })} style={{ background: 'transparent', border: 'none', color: '#4ade80', cursor: 'pointer' }} title="Approve & Assign Time"><CheckCircle size={20} /></button>
-                              <button onClick={() => setActionModal({ type: 'Reject', id: apt.id })} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }} title="Reject"><XCircle size={20} /></button>
-                            </>
-                          )}
-                        </td>
-                      )}
+                      <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
+                        {isDoctor && apt.status === 'Pending' && (
+                          <>
+                            <button onClick={() => setActionModal({ type: 'Approve', id: apt.id })} style={{ background: 'transparent', border: 'none', color: '#4ade80', cursor: 'pointer' }} title="Approve & Assign Time"><CheckCircle size={20} /></button>
+                            <button onClick={() => setActionModal({ type: 'Reject', id: apt.id })} style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }} title="Reject"><XCircle size={20} /></button>
+                          </>
+                        )}
+                        {(apt.status === 'Pending' || (apt.status === 'Approved' && isAdmin)) && (
+                          <button onClick={() => handleDelete(apt.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }} title="Delete Appointment">
+                            <Trash2 size={20} />
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   )
                 })}
