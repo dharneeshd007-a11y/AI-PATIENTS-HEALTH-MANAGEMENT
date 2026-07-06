@@ -20,7 +20,13 @@ router.post('/book', async (req, res) => {
 // Get all appointments (Admin)
 router.get('/', async (req, res) => {
     try {
-        const [appointments] = await pool.query('SELECT * FROM appointments');
+        const [appointments] = await pool.query(`
+            SELECT a.*, p.full_name AS patient_name, d.full_name AS doctor_name 
+            FROM appointments a 
+            LEFT JOIN users p ON a.patient_id = p.id 
+            LEFT JOIN users d ON a.doctor_id = d.id
+            ORDER BY a.created_at DESC
+        `);
         res.status(200).json(appointments);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch appointments' });
@@ -31,9 +37,15 @@ router.get('/', async (req, res) => {
 router.get('/:userId/:role', async (req, res) => {
     try {
         const { userId, role } = req.params;
-        let query = '';
-        if (role === 'Doctor') query = 'SELECT * FROM appointments WHERE doctor_id = ?';
-        else if (role === 'Patient') query = 'SELECT * FROM appointments WHERE patient_id = ?';
+        let query = `
+            SELECT a.*, p.full_name AS patient_name, d.full_name AS doctor_name 
+            FROM appointments a 
+            LEFT JOIN users p ON a.patient_id = p.id 
+            LEFT JOIN users d ON a.doctor_id = d.id 
+            WHERE 
+        `;
+        if (role === 'Doctor') query += 'a.doctor_id = ? ORDER BY a.created_at DESC';
+        else if (role === 'Patient') query += 'a.patient_id = ? ORDER BY a.created_at DESC';
         else return res.status(403).json({ error: 'Invalid role' });
 
         const [appointments] = await pool.query(query, [userId]);
@@ -47,8 +59,13 @@ router.get('/:userId/:role', async (req, res) => {
 router.put('/:id/approve', async (req, res) => {
     try {
         const { id } = req.params;
-        const { appointment_time } = req.body;
-        await pool.query('UPDATE appointments SET status = ?, appointment_time = ? WHERE id = ?', ['Approved', appointment_time, id]);
+        const { appointment_time, doctor_id } = req.body;
+        
+        if (doctor_id) {
+            await pool.query('UPDATE appointments SET status = ?, appointment_time = ?, doctor_id = ? WHERE id = ?', ['Approved', appointment_time, doctor_id, id]);
+        } else {
+            await pool.query('UPDATE appointments SET status = ?, appointment_time = ? WHERE id = ?', ['Approved', appointment_time, id]);
+        }
         res.status(200).json({ message: 'Appointment approved' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to approve' });

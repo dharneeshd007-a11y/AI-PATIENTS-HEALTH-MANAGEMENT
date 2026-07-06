@@ -61,6 +61,9 @@ const Sidebar = () => {
             <NavLink to="/admin-patients" style={navLinkStyle}>
               <HeartPulse size={20} /> Patients
             </NavLink>
+            <NavLink to="/appointments" style={navLinkStyle}>
+              <Calendar size={20} /> Appointments
+            </NavLink>
           </>
         )}
 

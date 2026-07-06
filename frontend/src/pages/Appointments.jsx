@@ -66,7 +66,10 @@ const Appointments = () => {
   const submitAction = async () => {
     try {
       if (actionModal.type === 'Approve') {
-        await axios.put(`/api/appointments/${actionModal.id}/approve`, { appointment_time: actionInput });
+        await axios.put(`/api/appointments/${actionModal.id}/approve`, { 
+          appointment_time: actionInput,
+          doctor_id: user?.id 
+        });
       } else if (actionModal.type === 'Reject') {
         await axios.put(`/api/appointments/${actionModal.id}/reject`, { rejection_reason: actionInput });
       }
@@ -138,8 +141,8 @@ const Appointments = () => {
                 <tr style={{ borderBottom: '1px solid var(--glass-border)', textAlign: 'left' }}>
                   <th style={{ padding: '1rem' }}>Date</th>
                   <th style={{ padding: '1rem' }}>Assigned Time</th>
-                  {(isAdmin || isDoctor) && <th style={{ padding: '1rem' }}>Patient ID</th>}
-                  {(isAdmin || isPatient) && <th style={{ padding: '1rem' }}>Doctor ID</th>}
+                  {(isAdmin || isDoctor) && <th style={{ padding: '1rem' }}>Patient Name</th>}
+                  {(isAdmin || isPatient) && <th style={{ padding: '1rem' }}>Doctor Name</th>}
                   <th style={{ padding: '1rem' }}>Reason</th>
                   <th style={{ padding: '1rem' }}>Status</th>
                   {isDoctor && <th style={{ padding: '1rem' }}>Actions</th>}
@@ -157,8 +160,8 @@ const Appointments = () => {
                     <tr key={apt.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <td style={{ padding: '1rem' }}>{new Date(apt.appointment_date).toLocaleDateString()}</td>
                       <td style={{ padding: '1rem' }}>{timeDisplay}</td>
-                      {(isAdmin || isDoctor) && <td style={{ padding: '1rem' }}>{apt.patient_id}</td>}
-                      {(isAdmin || isPatient) && <td style={{ padding: '1rem' }}>{apt.doctor_id}</td>}
+                      {(isAdmin || isDoctor) && <td style={{ padding: '1rem' }}>{apt.patient_name || `ID: ${apt.patient_id}`}</td>}
+                      {(isAdmin || isPatient) && <td style={{ padding: '1rem' }}>{apt.doctor_name || (apt.doctor_id ? `ID: ${apt.doctor_id}` : 'Unassigned')}</td>}
                       <td style={{ padding: '1rem' }}>
                         <div>{apt.reason}</div>
                         {apt.rejection_reason && apt.status === 'Rejected' && (

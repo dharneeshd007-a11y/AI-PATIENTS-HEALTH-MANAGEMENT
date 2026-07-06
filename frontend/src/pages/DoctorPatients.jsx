@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Eye, FileText, Activity } from 'lucide-react';
+import { Eye, FileText, Activity, Pill } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MedicalNotesModal from '../components/MedicalNotesModal';
 
@@ -34,6 +34,7 @@ const DoctorPatients = () => {
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Patient ID</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Patient Name</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Room</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Vitals</th>
@@ -44,6 +45,7 @@ const DoctorPatients = () => {
           <tbody>
             {patients.map(p => (
               <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>P{p.id}</td>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>{p.name} <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{p.age} yrs | {p.gender}</div></td>
                 <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{p.room}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>
@@ -63,6 +65,7 @@ const DoctorPatients = () => {
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => navigate(`/live-monitoring?patientId=${p.id}`)} title="Live Monitoring" style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer' }}><Activity size={18} /></button>
                     <button onClick={() => navigate(`/ecg-analysis?patientId=${p.id}`)} title="ECG Analysis" style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer' }}><Eye size={18} /></button>
+                    <button onClick={() => navigate(`/medications?patientId=${p.id}`)} title="Prescribe Medication" style={{ background: 'none', border: 'none', color: '#10b981', cursor: 'pointer' }}><Pill size={18} /></button>
                     <button onClick={() => setSelectedPatientForNotes(p)} title="Add Note" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><FileText size={18} /></button>
                   </div>
                 </td>

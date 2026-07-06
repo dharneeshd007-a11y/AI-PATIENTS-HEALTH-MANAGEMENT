@@ -12,6 +12,7 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [alerts, setAlerts] = useState([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
 
   useEffect(() => {
     const fetchMyData = async () => {
@@ -37,6 +38,10 @@ const PatientDashboard = () => {
           (a.patient_name === user?.full_name || a.patient === user?.full_name)
         );
         setAlerts(myCriticalAlerts.slice(0, 3));
+
+        // Fetch appointments
+        const aptRes = await axios.get(`/api/appointments/${user?.id}/${user?.role}`);
+        setUpcomingAppointments(aptRes.data.slice(0, 3));
       } catch (err) {
         console.error(err);
         setError("Could not find medical records linked to this account name. (Hint: Try registering as 'John Doe' or 'Jane Smith')");
@@ -107,6 +112,37 @@ const PatientDashboard = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {upcomingAppointments.length > 0 && (
+        <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto 2rem auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <h3 style={{ margin: 0 }}>Upcoming Appointments</h3>
+            <button className="btn btn-outline" onClick={() => navigate('/appointments')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}>View All</button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            {upcomingAppointments.map(apt => (
+              <div key={apt.id} style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <div style={{ fontWeight: 600 }}>{new Date(apt.appointment_date).toLocaleDateString()}</div>
+                  <div style={{ fontSize: '0.85rem', padding: '2px 8px', borderRadius: '12px', 
+                    background: apt.status === 'Approved' ? 'rgba(34, 197, 94, 0.2)' : apt.status === 'Rejected' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                    color: apt.status === 'Approved' ? '#4ade80' : apt.status === 'Rejected' ? '#f87171' : '#facc15'
+                  }}>
+                    {apt.status}
+                  </div>
+                </div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ marginBottom: '4px' }}><strong>Doctor:</strong> {apt.doctor_name || (apt.doctor_id ? `Dr. ID ${apt.doctor_id}` : 'Unassigned')}</div>
+                  <div style={{ marginBottom: '4px' }}><strong>Reason:</strong> {apt.reason}</div>
+                  {apt.status === 'Approved' && <div style={{ marginBottom: '4px' }}><strong>Assigned Time:</strong> {apt.appointment_time}</div>}
+                  {apt.status === 'Rejected' && <div style={{ marginBottom: '4px' }}><strong>Reason:</strong> {apt.rejection_reason}</div>}
+                  {apt.status === 'Pending' && <div style={{ color: '#facc15', marginTop: '4px' }}>Waiting for Doctor to assign a time</div>}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

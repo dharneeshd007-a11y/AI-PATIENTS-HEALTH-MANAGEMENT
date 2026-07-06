@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 import authService from '../services/authService';
 import { Pill, Trash2, Plus, Clock, CheckCircle, XCircle } from 'lucide-react';
 
@@ -7,6 +8,9 @@ const Medications = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const initialPatientId = searchParams.get('patientId') || '';
+  const [patientName, setPatientName] = useState('');
   
   const user = authService.getCurrentUser()?.user;
   const isDoctor = user?.role === 'Doctor';
@@ -18,7 +22,13 @@ const Medications = () => {
     if (isPatient) {
       fetchHistory();
     }
-  }, [user]);
+    if (initialPatientId && isDoctor) {
+      axios.get('/api/patients').then(res => {
+        const p = res.data.find(x => x.id == initialPatientId);
+        if (p) setPatientName(p.name);
+      }).catch(err => console.error(err));
+    }
+  }, [user, initialPatientId]);
 
   const fetchData = async () => {
     try {
@@ -100,7 +110,10 @@ const Medications = () => {
         <div className="glass-card" style={{ marginBottom: '2rem' }}>
           <h3>Create New Prescription</h3>
           <form onSubmit={handleAdd} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-            <input type="number" name="patient_id" placeholder="Patient ID" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input type="number" name="patient_id" placeholder="Patient ID" defaultValue={initialPatientId} readOnly={!!initialPatientId} required style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: initialPatientId ? 'var(--text-secondary)' : 'white' }} />
+              {patientName && <span style={{ color: 'var(--accent-green)', whiteSpace: 'nowrap', fontSize: '0.9rem' }}>✓ {patientName}</span>}
+            </div>
             <input type="text" name="medicine_name" placeholder="Medicine Name (e.g. Lisinopril)" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
             <input type="text" name="dosage" placeholder="Dosage (e.g. 10mg)" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
             <input type="text" name="frequency" placeholder="Frequency (e.g. Once Daily)" required style={{ padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
