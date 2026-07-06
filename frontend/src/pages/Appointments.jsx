@@ -95,6 +95,12 @@ const Appointments = () => {
       fetchAppointments();
     } catch (error) {
       console.error('Failed to update status', error);
+      if (error.response?.status === 409) {
+        alert(error.response.data.error || "This time slot is already booked. Please choose another available time.");
+      } else {
+        setActionModal(null);
+        setActionInput('');
+      }
     }
   };
 

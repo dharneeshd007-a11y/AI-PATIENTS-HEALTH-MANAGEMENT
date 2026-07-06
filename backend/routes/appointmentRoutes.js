@@ -61,6 +61,23 @@ router.put('/:id/approve', async (req, res) => {
         const { id } = req.params;
         const { appointment_time, doctor_id } = req.body;
         
+        // Double-booking check
+        if (doctor_id && appointment_time) {
+            const [aptRows] = await pool.query('SELECT appointment_date FROM appointments WHERE id = ?', [id]);
+            if (aptRows.length === 0) return res.status(404).json({ error: 'Appointment not found' });
+            
+            const aptDate = aptRows[0].appointment_date;
+            
+            const [conflicts] = await pool.query(
+                "SELECT id FROM appointments WHERE doctor_id = ? AND DATE(appointment_date) = DATE(?) AND appointment_time = ? AND status IN ('Approved', 'Completed') AND id != ?",
+                [doctor_id, aptDate, appointment_time, id]
+            );
+            
+            if (conflicts.length > 0) {
+                return res.status(409).json({ error: `${appointment_time} is already booked for this doctor. Please choose another available time.` });
+            }
+        }
+        
         if (doctor_id) {
             await pool.query('UPDATE appointments SET status = ?, appointment_time = ?, doctor_id = ? WHERE id = ?', ['Approved', appointment_time, doctor_id, id]);
         } else {
