@@ -42,17 +42,24 @@ const Appointments = () => {
     const reason = e.target.reason.value;
     const doctor_id = 2; // Default mock doctor
 
+    if (!user || !user.id) {
+      alert("Please login to book an appointment");
+      return;
+    }
+
     try {
       await axios.post('/api/appointments/book', {
-        patient_id: user?.id,
+        patient_id: user.id,
         doctor_id,
         appointment_date: date,
         reason
       });
+      alert("Appointment booked successfully!");
       fetchAppointments();
       e.target.reset();
     } catch (error) {
       console.error('Failed to book appointment', error);
+      alert(error.response?.data?.error || "Failed to book appointment");
     }
   };
 

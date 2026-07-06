@@ -1,16 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2/promise');
-
-// Note: Replace with actual DB connection pool from your project's db config
-// Assuming a db.js or similar exists, but using a generic pool structure for now
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  ssl: process.env.DB_HOST !== 'localhost' ? { rejectUnauthorized: false } : undefined
-});
+const pool = require('../config/db');
 
 // Book an appointment (Patient)
 router.post('/book', async (req, res) => {
@@ -22,6 +12,7 @@ router.post('/book', async (req, res) => {
         );
         res.status(201).json({ message: 'Appointment booked successfully', id: result.insertId });
     } catch (error) {
+        console.error('Error booking appointment:', error);
         res.status(500).json({ error: 'Failed to book appointment' });
     }
 });
