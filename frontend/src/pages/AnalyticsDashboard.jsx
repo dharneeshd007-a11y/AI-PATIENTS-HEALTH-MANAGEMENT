@@ -58,7 +58,7 @@ const AnalyticsDashboard = () => {
       {stats && (
         <div className="glass-card" style={{ minHeight: '400px', display: 'flex', flexDirection: 'column', color: 'white', marginTop: '1rem' }}>
           <h3 style={{ marginBottom: '1.5rem', marginLeft: '1rem' }}>Hospital Trends (Last 6 Months)</h3>
-          <div style={{ flex: 1, width: '100%', minHeight: '350px' }}>
+          <div style={{ width: '100%', height: '350px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={[
