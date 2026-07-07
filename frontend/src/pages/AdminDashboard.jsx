@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import authService from '../services/authService';
-import { Users, AlertTriangle, FileText, HeartPulse } from 'lucide-react';
+import { Users, AlertTriangle, FileText, HeartPulse, Activity } from 'lucide-react';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
