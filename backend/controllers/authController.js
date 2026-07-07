@@ -45,59 +45,38 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// Login User
+// Unified Phone Login
 exports.loginUser = async (req, res) => {
-  const { email, password, role } = req.body;
+  const { phone, password } = req.body;
 
-  if (!email || !password || !role) {
-    return res.status(400).json({ message: 'Please provide email, password, and role' });
+  if (!phone || !password) {
+    return res.status(400).json({ message: 'Please provide phone number and password' });
   }
 
   try {
-    // Developer/Troubleshooting fallback login credentials
-    if (
-      (email === 'dharneeshd007@gmail.com' && password === 'Dharneesh2007' && role === 'Admin') ||
-      (email === 'admin@kmch.com' && role === 'Admin') ||
-      (email === 'smith@hospital.com' && role === 'Doctor')
-    ) {
-      const token = jwt.sign(
-        { id: 9999, email: email, role: role }, 
-        SECRET_KEY, 
-        { expiresIn: '1d' }
-      );
+    // Developer/Troubleshooting fallback (Dev Admin & Dev Doctor mapped to phone)
+    if (phone === '7904138308' && password === 'Dharneesh2007') {
+      const token = jwt.sign({ id: 9999, email: 'dharneeshd007@gmail.com', role: 'Admin' }, SECRET_KEY, { expiresIn: '1d' });
       return res.json({
-        message: 'Login successful (Dev Fallback)',
-        token,
-        user: {
-          id: 9999,
-          full_name: email === 'smith@hospital.com' ? 'Dr. Smith' : 'DHARNEESH D',
-          email: email,
-          phone: '7904138308',
-          role: role
-        }
+        message: 'Login successful (Dev Fallback)', token,
+        user: { id: 9999, full_name: 'DHARNEESH D', email: 'dharneeshd007@gmail.com', phone: '7904138308', role: 'Admin', patient_type: 'OP' }
       });
     }
 
-    const [users] = await db.query(
-      'SELECT * FROM users WHERE email = ?', 
-      [email]
-    );
+    const [users] = await db.query('SELECT * FROM users WHERE phone = ?', [phone]);
     
     if (users.length === 0) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({ message: 'Invalid phone number or password.' });
     }
 
     const user = users[0];
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({ message: 'Invalid phone number or password.' });
     }
 
-    if (user.role !== role) {
-      return res.status(401).json({ message: 'Invalid role for this user.' });
-    }
-
+    // Auto-detect Patient Type
     let patient_type = 'OP';
     let is_admitted = false;
 
@@ -109,34 +88,69 @@ exports.loginUser = async (req, res) => {
           is_admitted = !!patientRecords[0].is_admitted;
         }
       } catch (err) {
-        // Fallback gracefully if patient_type/is_admitted columns do not exist in DB yet
         console.warn('Patient columns missing in DB, falling back to OP:', err.message);
       }
     }
 
-    // Generate token
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role }, 
-      SECRET_KEY, 
-      { expiresIn: '1d' }
-    );
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
 
     res.json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user.id,
-        full_name: user.full_name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        patient_type,
-        is_admitted
-      }
+      message: 'Login successful', token,
+      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type, is_admitted }
     });
-
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
+  }
+};
+
+// Mock Google Login API
+exports.googleLogin = async (req, res) => {
+  const { email, full_name } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ message: 'Google Authentication failed' });
+  }
+
+  try {
+    let user;
+    const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    
+    if (existingUsers.length > 0) {
+      user = existingUsers[0];
+      // Prevent Google Login for Admins, Doctors, or ICU Patients
+      if (user.role !== 'Patient') {
+        return res.status(403).json({ message: 'Google Login is restricted to OP Patients only.' });
+      }
+      
+      const [patientRecords] = await db.query('SELECT patient_type FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+      if (patientRecords.length > 0 && patientRecords[0].patient_type === 'ICU') {
+        return res.status(403).json({ message: 'ICU Patients must login using Phone Number.' });
+      }
+    } else {
+      // Auto-register new OP patient via Google
+      const randomPassword = Math.random().toString(36).slice(-8);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+      const tempPhone = 'G-' + Math.floor(Math.random() * 10000000);
+      
+      const [result] = await db.query(
+        'INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)',
+        [full_name || email.split('@')[0], email, tempPhone, hashedPassword, 'Patient']
+      );
+      
+      const [newUsers] = await db.query('SELECT * FROM users WHERE id = ?', [result.insertId]);
+      user = newUsers[0];
+    }
+
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
+    
+    res.json({
+      message: 'Google Login successful', token,
+      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type: 'OP', is_admitted: false }
+    });
+  } catch (error) {
+    console.error('Google Login error:', error);
+    res.status(500).json({ message: 'Server error during Google Login' });
   }
 };

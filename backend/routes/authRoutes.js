@@ -8,4 +8,7 @@ router.post('/register', authController.registerUser);
 // POST /api/auth/login
 router.post('/login', authController.loginUser);
 
+// POST /api/auth/google
+router.post('/google', authController.googleLogin);
+
 module.exports = router;
