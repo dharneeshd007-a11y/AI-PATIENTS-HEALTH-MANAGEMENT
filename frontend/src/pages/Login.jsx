@@ -26,7 +26,8 @@ const Login = () => {
       try {
         const user = JSON.parse(decodeURIComponent(userParam));
         localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        // authService expects the cached 'user' string to be an object containing { token, user }
+        localStorage.setItem('user', JSON.stringify({ token, user }));
         routeUser(user, { token, user });
       } catch (err) {
         console.error("Failed to parse user data from URL", err);
