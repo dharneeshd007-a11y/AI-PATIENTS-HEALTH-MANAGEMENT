@@ -7,6 +7,9 @@ const db = require('./config/db');
 // Load environment variables
 dotenv.config();
 
+const session = require('express-session');
+const passport = require('./config/passport');
+
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -27,6 +30,15 @@ app.set('io', io); // Make io accessible in routes
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(session({
+  secret: process.env.JWT_SECRET || 'super_secret_session_key',
+  resave: false,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Basic route
 app.get('/', (req, res) => {

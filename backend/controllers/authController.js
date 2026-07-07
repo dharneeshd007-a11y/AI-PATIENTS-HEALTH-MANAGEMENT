@@ -109,45 +109,12 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// Mock Google Login API
-exports.googleLogin = async (req, res) => {
-  const { email, full_name } = req.body;
-  
-  if (!email) {
-    return res.status(400).json({ message: 'Google Authentication failed' });
-  }
-
+// Google OAuth Callback Handler
+exports.googleCallback = async (req, res) => {
   try {
-    let user;
-    const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    const user = req.user;
     
-    if (existingUsers.length > 0) {
-      user = existingUsers[0];
-      // Prevent Google Login for Admins, Doctors, or ICU Patients
-      if (user.role !== 'Patient') {
-        return res.status(403).json({ message: 'Google Login is restricted to OP Patients only.' });
-      }
-      
-      const [patientRecords] = await db.query('SELECT patient_type FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
-      if (patientRecords.length > 0 && patientRecords[0].patient_type === 'ICU') {
-        return res.status(403).json({ message: 'ICU Patients must login using Phone Number.' });
-      }
-    } else {
-      // Auto-register new OP patient via Google
-      const randomPassword = Math.random().toString(36).slice(-8);
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(randomPassword, salt);
-      const tempPhone = 'G-' + Math.floor(Math.random() * 10000000);
-      
-      const [result] = await db.query(
-        'INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)',
-        [full_name || email.split('@')[0], email, tempPhone, hashedPassword, 'Patient']
-      );
-      
-      const [newUsers] = await db.query('SELECT * FROM users WHERE id = ?', [result.insertId]);
-      user = newUsers[0];
-    }
-
+    // Auto-detect Patient Type
     let patient_id = null;
     let patient_type = 'OP';
     
@@ -161,12 +128,25 @@ exports.googleLogin = async (req, res) => {
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     
-    res.json({
-      message: 'Google Login successful', token,
-      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type, is_admitted: false, patient_id, doctor_id: null }
-    });
+    // Redirect to the frontend with token and user data in query params, or set a cookie and redirect
+    // A simple approach is redirecting with token in URL and letting frontend store it.
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    
+    const userData = encodeURIComponent(JSON.stringify({
+      id: user.id, 
+      full_name: user.full_name, 
+      email: user.email, 
+      phone: user.phone, 
+      role: user.role, 
+      patient_type, 
+      is_admitted: false, 
+      patient_id, 
+      doctor_id: null
+    }));
+
+    res.redirect(`${frontendUrl}/login?token=${token}&user=${userData}`);
   } catch (error) {
-    console.error('Google Login error:', error);
-    res.status(500).json({ message: 'Server error during Google Login' });
+    console.error('Google Callback error:', error);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=true`);
   }
 };

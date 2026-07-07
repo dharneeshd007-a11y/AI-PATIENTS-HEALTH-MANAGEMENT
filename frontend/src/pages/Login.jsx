@@ -13,6 +13,28 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  // Handle OAuth callback token and user from URL query params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    const userParam = params.get('user');
+    const errorParam = params.get('error');
+
+    if (errorParam) {
+      showToast("Google Authentication failed.", "error");
+    } else if (token && userParam) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userParam));
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        routeUser(user, { token, user });
+      } catch (err) {
+        console.error("Failed to parse user data from URL", err);
+        showToast("Error processing login data.", "error");
+      }
+    }
+  }, []);
+
   // Clear toast after 5 seconds
   useEffect(() => {
     if (toast.show) {
@@ -86,33 +108,11 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setGoogleLoading(true);
-    setToast({ show: false, message: '', type: '' });
-    
-    try {
-      const mockEmail = window.prompt("Google Sign-In Simulation\n\nEnter your Google Email Address:");
-      if (!mockEmail) {
-        setGoogleLoading(false);
-        return;
-      }
-      
-      const payload = {
-        email: mockEmail,
-        full_name: mockEmail.split('@')[0]
-      };
-      
-      console.log("Attempting Google Login API...");
-      const data = await authService.googleLogin(payload);
-      console.log("Google Login API Response received successfully.", data);
-      routeUser(data.user, data);
-    } catch (err) {
-      console.error("Google Login API Error:", err);
-      const errorMsg = err.response?.data?.message || 'Google Authentication failed.';
-      showToast(errorMsg, "error");
-    } finally {
-      setGoogleLoading(false);
-    }
+    // Redirect directly to the backend Google OAuth endpoint
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    window.location.href = `${apiUrl}/api/auth/google`;
   };
 
   return (
