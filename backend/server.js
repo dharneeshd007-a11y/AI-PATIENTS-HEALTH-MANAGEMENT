@@ -7,6 +7,11 @@ const db = require('./config/db');
 // Load environment variables
 dotenv.config();
 
+console.log('--- STARTUP OAUTH CONFIG ---');
+console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
+console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
+console.log('----------------------------');
+
 const session = require('express-session');
 const passport = require('./config/passport');
 
