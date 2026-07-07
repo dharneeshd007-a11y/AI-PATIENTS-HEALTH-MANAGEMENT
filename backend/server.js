@@ -43,6 +43,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const medicationRoutes = require('./routes/medicationRoutes');
 const emergencyRoutes = require('./routes/emergencyRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const icuRoutes = require('./routes/icuRoutes');
 
 app.use('/api', indexRoutes);
 app.use('/api/patients', patientRoutes);
@@ -53,6 +54,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/icu', icuRoutes);
 
 // 404 handler specifically for API routes
 app.get('/api/setup', (req, res) => {

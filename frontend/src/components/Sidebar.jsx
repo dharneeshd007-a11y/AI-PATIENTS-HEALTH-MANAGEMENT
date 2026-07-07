@@ -4,7 +4,9 @@ import { Activity, Users, AlertTriangle, Settings, FileText, UserPlus, HeartPuls
 import authService from '../services/authService';
 
 const Sidebar = () => {
-  const userRole = authService.getCurrentUser()?.user?.role || 'Doctor';
+  const currentUser = authService.getCurrentUser()?.user;
+  const userRole = currentUser?.role || 'Doctor';
+  const patientType = currentUser?.patient_type || 'OP';
 
   const getDashboardLink = () => {
     if (userRole === 'Admin') return '/admin-dashboard';
@@ -92,21 +94,36 @@ const Sidebar = () => {
             <NavLink to="/emergency-sos" style={navLinkStyle}>
               <AlertCircle size={20} color="#ef4444" /> Emergency SOS
             </NavLink>
-            <NavLink to="/appointments" style={navLinkStyle}>
-              <Calendar size={20} /> Appointments
-            </NavLink>
-            <NavLink to="/medications" style={navLinkStyle}>
-              <Pill size={20} /> Medications
-            </NavLink>
-            <NavLink to="/my-health" style={navLinkStyle}>
-              <User size={20} /> My Health
-            </NavLink>
-            <NavLink to="/live-monitoring" style={navLinkStyle}>
-              <Monitor size={20} /> Live Monitoring
-            </NavLink>
-            <NavLink to="/ecg-analysis" style={navLinkStyle}>
-              <Eye size={20} /> ECG Report
-            </NavLink>
+            
+            {patientType === 'OP' ? (
+              <>
+                <NavLink to="/appointments" style={navLinkStyle}>
+                  <Calendar size={20} /> Appointments
+                </NavLink>
+                <NavLink to="/medications" style={navLinkStyle}>
+                  <Pill size={20} /> Medications
+                </NavLink>
+                <NavLink to="/my-health" style={navLinkStyle}>
+                  <User size={20} /> My Health
+                </NavLink>
+              </>
+            ) : (
+              <>
+                <NavLink to="/live-monitoring" style={navLinkStyle}>
+                  <Monitor size={20} /> Live Monitoring
+                </NavLink>
+                <NavLink to="/ecg-analysis" style={navLinkStyle}>
+                  <Activity size={20} /> ECG Report
+                </NavLink>
+                <NavLink to="/my-health" style={navLinkStyle}>
+                  <HeartPulse size={20} /> Vitals
+                </NavLink>
+                <NavLink to="/medications" style={navLinkStyle}>
+                  <Pill size={20} /> Medications
+                </NavLink>
+              </>
+            )}
+
             <NavLink to="/patient-alerts" style={navLinkStyle}>
               <AlertTriangle size={20} /> Alert History
             </NavLink>

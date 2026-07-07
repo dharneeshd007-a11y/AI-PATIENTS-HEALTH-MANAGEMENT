@@ -98,6 +98,17 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid role for this user.' });
     }
 
+    let patient_type = 'OP';
+    let is_admitted = false;
+
+    if (user.role === 'Patient') {
+      const [patientRecords] = await db.query('SELECT patient_type, is_admitted FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+      if (patientRecords.length > 0) {
+        patient_type = patientRecords[0].patient_type || 'OP';
+        is_admitted = !!patientRecords[0].is_admitted;
+      }
+    }
+
     // Generate token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role }, 
@@ -113,7 +124,9 @@ exports.loginUser = async (req, res) => {
         full_name: user.full_name,
         email: user.email,
         phone: user.phone,
-        role: user.role
+        role: user.role,
+        patient_type,
+        is_admitted
       }
     });
 
