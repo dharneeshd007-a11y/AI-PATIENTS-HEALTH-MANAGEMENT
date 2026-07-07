@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/authService';
-import { HeartPulse, Lock, Phone as PhoneIcon, Chrome } from 'lucide-react';
+import { HeartPulse, Lock, Phone as PhoneIcon, Globe } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -134,7 +134,7 @@ const Login = () => {
         </div>
 
         <button onClick={handleGoogleLogin} type="button" className="btn btn-google" disabled={loading || googleLoading}>
-          <Chrome size={20} />
+          <Globe size={20} />
           {googleLoading ? 'Connecting...' : 'Continue with Google (OP Patients)'}
         </button>
 
