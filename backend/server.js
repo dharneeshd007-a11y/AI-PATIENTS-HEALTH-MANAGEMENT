@@ -12,6 +12,9 @@ console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
 console.log('GOOGLE_CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
 console.log('----------------------------');
 
+// Auto-migrate database to support Google Login
+db.query("ALTER TABLE users ADD COLUMN google_id VARCHAR(255) UNIQUE").catch(e => console.log("DB Auto-migrate (google_id):", e.message));
+
 const session = require('express-session');
 const passport = require('./config/passport');
 

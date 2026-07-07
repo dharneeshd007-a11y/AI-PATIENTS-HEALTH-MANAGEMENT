@@ -119,10 +119,14 @@ exports.googleCallback = async (req, res) => {
     let patient_type = 'OP';
     
     if (user.role === 'Patient') {
-      const [patientRecords] = await db.query('SELECT id, patient_type FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
-      if (patientRecords.length > 0) {
-        patient_id = patientRecords[0].id;
-        patient_type = patientRecords[0].patient_type || 'OP';
+      try {
+        const [patientRecords] = await db.query('SELECT id, patient_type FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+        if (patientRecords.length > 0) {
+          patient_id = patientRecords[0].id;
+          patient_type = patientRecords[0].patient_type || 'OP';
+        }
+      } catch (err) {
+        console.warn('Patient columns missing in DB for Google Callback, falling back to OP:', err.message);
       }
     }
 
