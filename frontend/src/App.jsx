@@ -117,6 +117,12 @@ function App() {
         </ProtectedRoute>
       } />
 
+      <Route path="/icu-dashboard" element={
+        <ProtectedRoute allowedRoles={['Patient']}>
+          <AppLayout><PatientDashboard /></AppLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="/my-health" element={
         <ProtectedRoute allowedRoles={['Patient']}>
           <AppLayout><MyHealth /></AppLayout>
@@ -183,6 +189,9 @@ function App() {
 
       {/* Root Route - Always start at Login page as requested */}
       <Route path="/" element={<Navigate to="/login" replace />} />
+      
+      {/* Catch-All Route to prevent blank pages */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
       
       <Route path="/alerts" element={
         <ProtectedRoute allowedRoles={['Doctor', 'Admin']}>

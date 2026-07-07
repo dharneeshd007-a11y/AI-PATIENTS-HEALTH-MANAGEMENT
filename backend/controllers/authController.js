@@ -79,24 +79,29 @@ exports.loginUser = async (req, res) => {
     // Auto-detect Patient Type
     let patient_type = 'OP';
     let is_admitted = false;
+    let patient_id = null;
+    let doctor_id = null;
 
     if (user.role === 'Patient') {
       try {
-        const [patientRecords] = await db.query('SELECT patient_type, is_admitted FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+        const [patientRecords] = await db.query('SELECT id, patient_type, is_admitted FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
         if (patientRecords.length > 0) {
+          patient_id = patientRecords[0].id;
           patient_type = patientRecords[0].patient_type || 'OP';
           is_admitted = !!patientRecords[0].is_admitted;
         }
       } catch (err) {
         console.warn('Patient columns missing in DB, falling back to OP:', err.message);
       }
+    } else if (user.role === 'Doctor') {
+      doctor_id = user.id;
     }
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
 
     res.json({
       message: 'Login successful', token,
-      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type, is_admitted }
+      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type, is_admitted, patient_id, doctor_id }
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -143,11 +148,22 @@ exports.googleLogin = async (req, res) => {
       user = newUsers[0];
     }
 
+    let patient_id = null;
+    let patient_type = 'OP';
+    
+    if (user.role === 'Patient') {
+      const [patientRecords] = await db.query('SELECT id, patient_type FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+      if (patientRecords.length > 0) {
+        patient_id = patientRecords[0].id;
+        patient_type = patientRecords[0].patient_type || 'OP';
+      }
+    }
+
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1d' });
     
     res.json({
       message: 'Google Login successful', token,
-      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type: 'OP', is_admitted: false }
+      user: { id: user.id, full_name: user.full_name, email: user.email, phone: user.phone, role: user.role, patient_type, is_admitted: false, patient_id, doctor_id: null }
     });
   } catch (error) {
     console.error('Google Login error:', error);

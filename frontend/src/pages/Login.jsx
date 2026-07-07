@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/authService';
-import { HeartPulse, Lock, Phone as PhoneIcon, Globe } from 'lucide-react';
+import { Lock, Phone as PhoneIcon, Globe, Activity, Stethoscope, HeartPulse, UserCircle } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -9,45 +9,88 @@ const Login = () => {
     phone: '',
     password: ''
   });
-  const [error, setError] = useState('');
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Clear toast after 5 seconds
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => setToast({ show: false, message: '', type: '' }), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (message, type = 'error') => {
+    setToast({ show: true, message, type });
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const routeUser = (user) => {
-    if (user.role === 'Admin') {
-      navigate('/admin-dashboard');
-    } else if (user.role === 'Doctor') {
-      navigate('/doctor-dashboard');
-    } else if (user.role === 'Patient') {
-      // Both OP and ICU use the unified patient dashboard which toggles context internally
-      navigate('/patient-dashboard');
+  const routeUser = (user, payload) => {
+    console.log("=== LOGIN DEBUG LOG ===");
+    console.log("Role:", user.role);
+    console.log("Patient Type:", user.patient_type);
+    console.log("Patient ID:", user.patient_id);
+    console.log("Doctor ID:", user.doctor_id);
+    console.log("JWT Payload:", payload);
+    
+    try {
+      if (user.role === 'Admin') {
+        console.log("Redirecting to: /admin-dashboard");
+        navigate('/admin-dashboard');
+      } else if (user.role === 'Doctor') {
+        console.log("Redirecting to: /doctor-dashboard");
+        navigate('/doctor-dashboard');
+      } else if (user.role === 'Patient') {
+        if (user.patient_type === 'ICU') {
+          console.log("Redirecting to: /icu-dashboard");
+          navigate('/icu-dashboard');
+        } else {
+          console.log("Redirecting to: /patient-dashboard");
+          navigate('/patient-dashboard');
+        }
+      } else {
+        showToast("Unrecognized role assigned to this user.");
+      }
+    } catch (err) {
+      console.error("Routing failed:", err);
+      showToast("Routing Error: Could not determine dashboard.", "error");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setToast({ show: false, message: '', type: '' });
 
+    console.log(`Attempting login to API...`);
     try {
       const data = await authService.login(formData);
-      routeUser(data.user);
+      console.log("Login API Response received successfully.", data);
+      routeUser(data.user, data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check credentials.');
+      console.error("Login API Error:", err);
+      let errorMsg = 'Network Error. Please try again later.';
+      if (err.response) {
+        if (err.response.status === 401) errorMsg = 'Invalid Phone Number or Password.';
+        else if (err.response.status === 400) errorMsg = 'Please fill out all required fields.';
+        else if (err.response.status === 500) errorMsg = 'Server Error. Contact Administrator.';
+        else errorMsg = err.response.data?.message || 'Authentication failed.';
+      }
+      showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError('');
     setGoogleLoading(true);
+    setToast({ show: false, message: '', type: '' });
+    
     try {
-      // Mock Google OAuth Popup
       const mockEmail = window.prompt("Google Sign-In Simulation\n\nEnter your Google Email Address:");
       if (!mockEmail) {
         setGoogleLoading(false);
@@ -59,35 +102,48 @@ const Login = () => {
         full_name: mockEmail.split('@')[0]
       };
       
+      console.log("Attempting Google Login API...");
       const data = await authService.googleLogin(payload);
-      routeUser(data.user);
+      console.log("Google Login API Response received successfully.", data);
+      routeUser(data.user, data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Google Login failed.');
+      console.error("Google Login API Error:", err);
+      const errorMsg = err.response?.data?.message || 'Google Authentication failed.';
+      showToast(errorMsg, "error");
     } finally {
       setGoogleLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
+    <div className="login-wrapper">
+      {/* Toast Notification */}
+      <div className={`toast-notification ${toast.show ? 'show' : ''} ${toast.type}`}>
+        {toast.message}
+      </div>
+
       {/* Animated Background Elements */}
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
-      
+      <div className="medical-background">
+        <svg className="ecg-line" viewBox="0 0 1000 200" preserveAspectRatio="none">
+          <polyline points="0,100 200,100 250,50 300,150 350,100 500,100 550,20 600,180 650,100 1000,100" />
+        </svg>
+      </div>
+
+      {/* Floating Medical Icons for Desktop */}
+      <div className="floating-icons">
+        <Stethoscope className="icon float-1" size={48} />
+        <HeartPulse className="icon float-2" size={48} />
+        <Activity className="icon float-3" size={48} />
+      </div>
+
       <div className="login-card glass-card">
         <div className="login-header">
-          <div className="logo-circle">
-            <HeartPulse size={40} color="var(--accent-blue)" />
+          <div className="kmch-logo">
+            <UserCircle size={40} color="#0ea5e9" strokeWidth={1.5} />
           </div>
-          <h2>Welcome Back</h2>
-          <p>Access your secure hospital portal</p>
+          <h1>KMCH AI Systems</h1>
+          <p>Continuous Remote Patient Telemetry</p>
         </div>
-        
-        {error && (
-          <div className="error-toast fade-in">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="input-group">
@@ -125,7 +181,7 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary login-btn" disabled={loading || googleLoading}>
-            {loading ? <span className="spinner"></span> : 'Login to Dashboard'}
+            {loading ? <span className="spinner"></span> : 'Secure Login'}
           </button>
         </form>
 
@@ -134,8 +190,8 @@ const Login = () => {
         </div>
 
         <button onClick={handleGoogleLogin} type="button" className="btn btn-google" disabled={loading || googleLoading}>
-          <Globe size={20} />
-          {googleLoading ? 'Connecting...' : 'Continue with Google (OP Patients)'}
+          <Globe size={20} color="#ea4335" />
+          {googleLoading ? 'Connecting...' : 'Continue with Google (OP Only)'}
         </button>
 
         <div className="register-prompt">
@@ -144,212 +200,308 @@ const Login = () => {
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `
-        .login-container {
+        :root {
+          --primary-dark: #0f172a;
+          --secondary-dark: #1e293b;
+          --accent-kmch: #0ea5e9;
+          --accent-kmch-hover: #0284c7;
+        }
+
+        body, html {
+          margin: 0;
+          padding: 0;
+          font-family: 'Inter', system-ui, sans-serif;
+          background-color: var(--primary-dark);
+        }
+
+        .login-wrapper {
           display: flex;
           justify-content: center;
           align-items: center;
           min-height: 100vh;
-          padding: 2rem;
           position: relative;
           overflow: hidden;
-          background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+          background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
         }
-        .blob {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          z-index: 0;
-          opacity: 0.5;
-        }
-        .blob-1 {
-          width: 400px;
-          height: 400px;
-          background: var(--accent-blue);
+
+        /* Toast Notifications */
+        .toast-notification {
+          position: fixed;
           top: -100px;
-          left: -100px;
-          animation: float 8s ease-in-out infinite;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(239, 68, 68, 0.95);
+          color: white;
+          padding: 1rem 2rem;
+          border-radius: 12px;
+          font-weight: 600;
+          box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+          transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          z-index: 1000;
+          backdrop-filter: blur(10px);
         }
-        .blob-2 {
-          width: 350px;
-          height: 350px;
-          background: var(--accent-cyan);
-          bottom: -50px;
-          right: -100px;
-          animation: float 10s ease-in-out infinite reverse;
+        .toast-notification.show {
+          top: 40px;
         }
+
+        /* Animated Background Elements */
+        .medical-background {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          opacity: 0.15;
+          pointer-events: none;
+        }
+
+        .ecg-line {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 200%;
+          height: 200px;
+          fill: none;
+          stroke: var(--accent-kmch);
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          animation: moveEcg 15s linear infinite;
+        }
+
+        @keyframes moveEcg {
+          0% { transform: translate(0, -50%); }
+          100% { transform: translate(-50%, -50%); }
+        }
+
+        .floating-icons {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+          pointer-events: none;
+        }
+        
+        .floating-icons .icon {
+          position: absolute;
+          color: rgba(14, 165, 233, 0.15);
+        }
+
+        .float-1 { top: 20%; left: 15%; animation: float 6s ease-in-out infinite; }
+        .float-2 { bottom: 25%; right: 20%; animation: float 8s ease-in-out infinite reverse; }
+        .float-3 { top: 30%; right: 15%; animation: float 7s ease-in-out infinite 1s; }
+
         @keyframes float {
-          0% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(30px) scale(1.1); }
-          100% { transform: translateY(0) scale(1); }
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(10deg); }
         }
+
+        /* Glassmorphism Card */
         .login-card {
           width: 100%;
           maxWidth: 420px;
+          margin: 0 1.5rem;
           position: relative;
-          z-index: 1;
+          z-index: 10;
           padding: 3rem 2.5rem;
-          background: rgba(255, 255, 255, 0.03);
+          background: rgba(30, 41, 59, 0.7);
           border-radius: 24px;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
           backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         .login-header {
           text-align: center;
           margin-bottom: 2.5rem;
         }
-        .logo-circle {
+
+        .kmch-logo {
           width: 80px;
           height: 80px;
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(14, 165, 233, 0.05) 100%);
+          border-radius: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 1.5rem;
-          box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 0 30px rgba(14, 165, 233, 0.2);
+          border: 1px solid rgba(14, 165, 233, 0.3);
+          transform: rotate(-5deg);
         }
-        .login-header h2 {
-          font-size: 2rem;
-          margin-bottom: 0.5rem;
+
+        .login-header h1 {
+          font-size: 1.8rem;
+          margin: 0 0 0.5rem 0;
           color: white;
+          font-weight: 700;
+          letter-spacing: -0.5px;
         }
+
         .login-header p {
-          color: var(--text-secondary);
+          color: #94a3b8;
           font-size: 0.95rem;
+          margin: 0;
         }
-        .error-toast {
-          background-color: rgba(239, 68, 68, 0.15);
-          color: #fca5a5;
-          padding: 1rem;
-          border-radius: 12px;
-          margin-bottom: 1.5rem;
-          text-align: center;
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          font-weight: 500;
-        }
-        .fade-in {
-          animation: fadeIn 0.3s ease-out;
-        }
+
+        /* Form Elements */
         .login-form {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
         }
+
         .input-group label {
           display: block;
           margin-bottom: 0.5rem;
-          color: var(--text-secondary);
+          color: #cbd5e1;
           font-size: 0.9rem;
           font-weight: 500;
         }
+
         .input-wrapper {
           position: relative;
           display: flex;
           align-items: center;
         }
+
         .input-icon {
           position: absolute;
-          left: 14px;
-          color: var(--text-secondary);
+          left: 16px;
+          color: #64748b;
+          transition: color 0.3s;
         }
+
         .input-wrapper input {
           width: 100%;
-          padding: 1rem 1rem 1rem 42px;
-          border-radius: 12px;
+          padding: 1rem 1rem 1rem 48px;
+          border-radius: 14px;
           border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(0, 0, 0, 0.2);
+          background: rgba(15, 23, 42, 0.6);
           color: white;
           font-size: 1rem;
           transition: all 0.3s ease;
         }
+
         .input-wrapper input:focus {
-          border-color: var(--accent-blue);
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+          border-color: var(--accent-kmch);
+          background: rgba(15, 23, 42, 0.8);
+          box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
           outline: none;
         }
+
+        .input-wrapper input:focus + .input-icon {
+          color: var(--accent-kmch);
+        }
+
         .forgot-password {
           text-align: right;
           margin-top: -0.5rem;
         }
+
         .forgot-password a {
-          color: var(--accent-cyan);
+          color: var(--accent-kmch);
           text-decoration: none;
           font-size: 0.85rem;
-          transition: opacity 0.2s;
+          font-weight: 500;
+          transition: color 0.2s;
         }
+
         .forgot-password a:hover {
-          opacity: 0.8;
+          color: #38bdf8;
         }
+
+        /* Buttons */
         .login-btn {
           padding: 1rem;
-          font-size: 1.1rem;
-          font-weight: bold;
-          border-radius: 12px;
-          background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
+          font-size: 1.05rem;
+          font-weight: 600;
+          border-radius: 14px;
+          background: linear-gradient(135deg, var(--accent-kmch) 0%, var(--accent-kmch-hover) 100%);
           border: none;
           color: white;
           cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition: all 0.3s ease;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-shadow: 0 10px 20px -10px rgba(14, 165, 233, 0.5);
         }
-        .login-btn:hover {
+
+        .login-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 10px 20px -10px var(--accent-cyan);
+          box-shadow: 0 15px 25px -10px rgba(14, 165, 233, 0.6);
         }
-        .login-btn:active {
+
+        .login-btn:active:not(:disabled) {
           transform: translateY(0);
         }
+
+        .login-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
         .divider {
           display: flex;
           align-items: center;
           text-align: center;
           margin: 1.5rem 0;
-          color: var(--text-secondary);
+          color: #64748b;
           font-size: 0.85rem;
+          font-weight: 500;
         }
+
         .divider::before, .divider::after {
           content: '';
           flex: 1;
           border-bottom: 1px solid rgba(255,255,255,0.1);
         }
+
         .divider span {
           padding: 0 1rem;
         }
+
         .btn-google {
           width: 100%;
           padding: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
+          gap: 12px;
           background: white;
-          color: #333;
+          color: #1e293b;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-weight: 600;
           font-size: 1rem;
           cursor: pointer;
-          transition: transform 0.2s;
+          transition: all 0.3s ease;
         }
-        .btn-google:hover {
+
+        .btn-google:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 10px 20px -10px rgba(255,255,255,0.5);
+          box-shadow: 0 10px 20px -10px rgba(255,255,255,0.2);
         }
+
         .register-prompt {
           text-align: center;
           margin-top: 2rem;
-          color: var(--text-secondary);
-          font-size: 0.9rem;
+          color: #94a3b8;
+          font-size: 0.95rem;
         }
+
         .register-prompt a {
-          color: white;
-          font-weight: bold;
+          color: var(--accent-kmch);
+          font-weight: 600;
           text-decoration: none;
           margin-left: 0.5rem;
+          transition: color 0.2s;
         }
+
         .register-prompt a:hover {
-          text-decoration: underline;
+          color: #38bdf8;
         }
+
         .spinner {
           display: inline-block;
           width: 20px;
@@ -359,8 +511,21 @@ const Login = () => {
           border-top-color: white;
           animation: spin 1s ease-in-out infinite;
         }
+
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+          .floating-icons {
+            display: none;
+          }
+          .login-card {
+            padding: 2.5rem 1.5rem;
+            border-radius: 20px;
+            margin: 0 1rem;
+          }
         }
       `}} />
     </div>
