@@ -53,13 +53,30 @@ router.get('/', async (req, res) => {
       ) v ON p.id = v.patient_id
     `;
     const [rows] = await db.query(query);
-    // Add default values if no vitals exist
-    const patients = rows.map(p => ({
-      ...p,
-      hr: p.hr || Math.floor(Math.random() * (100 - 60) + 60), // mock if null
-      spo2: p.spo2 || Math.floor(Math.random() * (100 - 95) + 95),
-      bp: p.bp || '120/80'
-    }));
+    
+    // Add default values if no vitals exist and fetch next appt for OP
+    const patients = [];
+    for (let p of rows) {
+      const patient = {
+        ...p,
+        hr: p.hr || Math.floor(Math.random() * (100 - 60) + 60), 
+        spo2: p.spo2 || Math.floor(Math.random() * (100 - 95) + 95),
+        bp: p.bp || '120/80'
+      };
+
+      if (p.patient_type === 'OP') {
+        const [appts] = await db.query(
+          'SELECT appointment_date, appointment_time, status FROM appointments WHERE patient_id = ? AND status != "Cancelled" ORDER BY appointment_date ASC LIMIT 1',
+          [p.id]
+        );
+        if (appts.length > 0) {
+          patient.next_appointment_date = appts[0].appointment_date;
+          patient.next_appointment_time = appts[0].appointment_time;
+        }
+      }
+      patients.push(patient);
+    }
+    
     res.json(patients);
   } catch (err) {
     console.error(err);

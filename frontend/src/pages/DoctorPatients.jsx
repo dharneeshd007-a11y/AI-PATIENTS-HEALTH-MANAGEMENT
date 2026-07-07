@@ -78,8 +78,9 @@ const DoctorPatients = () => {
             <tr style={{ borderBottom: '1px solid var(--glass-border)', backgroundColor: 'rgba(255,255,255,0.02)' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Patient ID</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Patient Name</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Room</th>
-              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Vitals</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Type</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{activeTab === 'ICU' ? 'Location' : 'Next Appointment'}</th>
+              <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{activeTab === 'ICU' ? 'Vitals' : 'Assigned Doctor'}</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Status</th>
               <th style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Actions</th>
             </tr>
@@ -91,10 +92,39 @@ const DoctorPatients = () => {
               <tr key={p.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500, color: 'var(--text-secondary)' }}>P{p.id}</td>
                 <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>{p.name} <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{p.age} yrs | {p.gender}</div></td>
-                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{p.room || 'Waiting Area'}</td>
                 <td style={{ padding: '1rem 1.5rem' }}>
-                  <div style={{ fontSize: '0.9rem' }}>HR: {p.hr || '--'} bpm</div>
-                  <div style={{ fontSize: '0.9rem' }}>SpO2: {p.spo2 || '--'}%</div>
+                  {p.patient_type === 'ICU' ? (
+                    <span style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>🟥 ICU</span>
+                  ) : (
+                    <span style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>🟦 OP</span>
+                  )}
+                </td>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>
+                  {activeTab === 'ICU' ? (
+                    <div>
+                      <div>Ward: {p.ward || '--'}</div>
+                      <div>Room: {p.room_no || '--'} | Bed: {p.bed_no || '--'}</div>
+                    </div>
+                  ) : (
+                    <div>
+                      {p.next_appointment_date ? (
+                        <>
+                          <div>Date: {new Date(p.next_appointment_date).toLocaleDateString()}</div>
+                          <div>Time: {p.next_appointment_time || '--'}</div>
+                        </>
+                      ) : 'No Upcoming Appts'}
+                    </div>
+                  )}
+                </td>
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  {activeTab === 'ICU' ? (
+                    <>
+                      <div style={{ fontSize: '0.9rem' }}>HR: {p.hr || '--'} bpm</div>
+                      <div style={{ fontSize: '0.9rem' }}>SpO2: {p.spo2 || '--'}%</div>
+                    </>
+                  ) : (
+                    <div style={{ color: 'var(--accent-cyan)' }}>Dr. {p.doctor_name || 'Unassigned'}</div>
+                  )}
                 </td>
                 <td style={{ padding: '1rem 1.5rem' }}>
                   <span style={{ 

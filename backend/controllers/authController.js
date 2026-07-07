@@ -102,10 +102,15 @@ exports.loginUser = async (req, res) => {
     let is_admitted = false;
 
     if (user.role === 'Patient') {
-      const [patientRecords] = await db.query('SELECT patient_type, is_admitted FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
-      if (patientRecords.length > 0) {
-        patient_type = patientRecords[0].patient_type || 'OP';
-        is_admitted = !!patientRecords[0].is_admitted;
+      try {
+        const [patientRecords] = await db.query('SELECT patient_type, is_admitted FROM patients WHERE name = ? AND phone = ?', [user.full_name, user.phone]);
+        if (patientRecords.length > 0) {
+          patient_type = patientRecords[0].patient_type || 'OP';
+          is_admitted = !!patientRecords[0].is_admitted;
+        }
+      } catch (err) {
+        // Fallback gracefully if patient_type/is_admitted columns do not exist in DB yet
+        console.warn('Patient columns missing in DB, falling back to OP:', err.message);
       }
     }
 

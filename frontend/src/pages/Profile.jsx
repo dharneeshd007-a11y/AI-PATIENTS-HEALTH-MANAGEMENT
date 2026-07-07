@@ -64,6 +64,12 @@ const Profile = () => {
             }}>
               <Shield size={14} /> {user?.role}
             </span>
+            {user?.role === 'Patient' && user?.patient_type === 'ICU' && (
+              <span style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>🟥 ICU Patient</span>
+            )}
+            {user?.role === 'Patient' && user?.patient_type === 'OP' && (
+              <span style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>🟦 OP Patient</span>
+            )}
           </div>
 
           <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '1.5rem', borderTop: '1px solid var(--glass-border)', paddingTop: '2rem' }}>

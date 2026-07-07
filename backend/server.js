@@ -44,9 +44,11 @@ const medicationRoutes = require('./routes/medicationRoutes');
 const emergencyRoutes = require('./routes/emergencyRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const icuRoutes = require('./routes/icuRoutes');
+const adminPatientRoutes = require('./routes/adminPatientRoutes');
 
 app.use('/api', indexRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/admin/patients', adminPatientRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
