@@ -34,7 +34,7 @@ const Input = ({
       <div className="relative">
         {/* Left Icon */}
         {Icon && (
-          <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+          <div className={`absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200 ${
             error ? 'text-red-500' : isFocused ? 'text-blue-600' : 'text-slate-400 dark:text-slate-500'
           }`}>
             <Icon size={18} />
@@ -54,8 +54,8 @@ const Input = ({
           className={`
             block w-full rounded-2xl bg-white dark:bg-slate-900/60
             border-2 outline-none transition-all duration-300
-            h-[56px] ${Icon ? 'pl-[44px]' : 'pl-5'} 
-            ${isPassword ? 'pr-[44px]' : 'pr-5'} 
+            h-14 ${Icon ? 'pl-12' : 'pl-5'} 
+            ${isPassword ? 'pr-12' : 'pr-5'} 
             text-[15px] text-slate-800 dark:text-slate-100 font-medium
             placeholder-slate-400/70 dark:placeholder-slate-500/50
             ${error 
@@ -71,7 +71,7 @@ const Input = ({
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
