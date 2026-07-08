@@ -44,7 +44,7 @@ const Sidebar = () => {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '3rem', padding: '0 1rem' }}>
         <Activity color="var(--accent-cyan)" size={32} />
-        <h2 style={{ fontSize: '1.2rem' }}>KMCH <span className="text-gradient">AI</span></h2>
+        <h2 style={{ fontSize: '1.2rem' }}>DKD <span className="text-gradient">Smart</span></h2>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

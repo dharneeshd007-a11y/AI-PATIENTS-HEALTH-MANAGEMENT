@@ -25,10 +25,10 @@ const HeroSection = () => {
           </div>
           <div>
             <h2 className="text-3xl font-extrabold text-white m-0 tracking-tight leading-none font-poppins">
-              AI Smart Hospital
+              DKD Smart Hospital
             </h2>
             <p className="text-white/80 text-[0.7rem] font-bold uppercase tracking-[0.2em] mt-1.5">
-              KMCH Hospitals
+              24×7 Emergency
             </p>
           </div>
         </div>
@@ -66,13 +66,13 @@ const HeroSection = () => {
       {/* Bottom Section - Hospital Contact */}
       <div className="relative z-10 flex justify-between items-end w-full">
         <div className="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl">
-          <div className="text-white/70 text-xs font-bold uppercase tracking-widest mb-3">Hospital Contact</div>
+          <div className="text-white/70 text-xs font-bold uppercase tracking-widest mb-3">DKD Smart Hospital</div>
           <div className="flex flex-col gap-2">
             <a href="tel:+919876543210" className="text-white font-semibold flex items-center gap-2 hover:text-accent transition-colors">
-              <FiPhoneCall /> +91 98765 43210
+              <FiPhoneCall /> Emergency Helpline: +91 98765 43210
             </a>
-            <a href="mailto:support@hospital.com" className="text-white/80 hover:text-white transition-colors">
-              support@hospital.com
+            <a href="mailto:support@dkdhospital.com" className="text-white/80 hover:text-white transition-colors">
+              support@dkdhospital.com
             </a>
           </div>
         </div>

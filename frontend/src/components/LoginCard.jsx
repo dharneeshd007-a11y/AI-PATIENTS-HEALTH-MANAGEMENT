@@ -125,7 +125,7 @@ const LoginCard = () => {
             value={formData.email}
             onChange={handleChange}
             error={errors.email}
-            placeholder="doctor@kmchai.com"
+            placeholder="doctor@dkdhospital.com"
           />
 
           <Input

@@ -36,7 +36,7 @@ axios.defaults.adapter = async function (config) {
       user: {
         id: 1,
         full_name: parsedData.full_name || 'DHARNEESH D',
-        email: parsedData.email || 'admin@kmch.com',
+        email: parsedData.email || 'admin@dkdhospital.com',
         role: parsedData.role || 'Admin',
       }
     });

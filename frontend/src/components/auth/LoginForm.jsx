@@ -77,7 +77,7 @@ const LoginForm = () => {
             <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
               <FiPlus size={24} strokeWidth={3} />
             </div>
-            <span className="text-xl font-bold text-slate-800 dark:text-white">AI Smart Hospital</span>
+            <span className="text-xl font-bold text-slate-800 dark:text-white">DKD Smart Hospital</span>
           </div>
           
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome Back</h2>
@@ -102,7 +102,7 @@ const LoginForm = () => {
             value={formData.email}
             onChange={handleChange}
             error={errors.email}
-            placeholder="doctor@hospital.com"
+            placeholder="doctor@dkdhospital.com"
           />
 
           <Input
@@ -148,7 +148,7 @@ const LoginForm = () => {
           <div className="text-center">
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 flex flex-col gap-1">
               <span>Don't have an account?</span>
-              <a href="mailto:admin@hospital.com" className="font-semibold text-primary hover:underline">
+              <a href="mailto:admin@dkdhospital.com" className="font-semibold text-primary hover:underline">
                 Contact Administrator
               </a>
             </p>
@@ -157,7 +157,7 @@ const LoginForm = () => {
         
         {/* Footer */}
         <div className="mt-6 text-center text-xs font-medium text-slate-500 dark:text-slate-500">
-          <p>© 2026 AI Smart Hospital. All Rights Reserved.</p>
+          <p>© 2026 DKD Smart Hospital. All Rights Reserved.</p>
         </div>
       </motion.div>
     </div>

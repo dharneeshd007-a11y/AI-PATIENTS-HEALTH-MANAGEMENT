@@ -59,7 +59,7 @@ const PDFReportGenerator = () => {
         
         <div style={{ borderBottom: '2px solid #2563eb', paddingBottom: '1rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div>
-            <h1 style={{ color: '#1e3a8a', margin: 0 }}>KMCH Medical Center</h1>
+            <h1 style={{ color: '#1e3a8a', margin: 0 }}>DKD Smart Hospital</h1>
             <p style={{ margin: 0, color: '#4b5563' }}>AI-Powered Telemetry & Arrhythmia Report</p>
           </div>
           <div style={{ textAlign: 'right', color: '#4b5563' }}>
