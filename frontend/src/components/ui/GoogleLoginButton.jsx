@@ -15,12 +15,11 @@ const GoogleLoginButton = ({ disabled, isLoading }) => {
       onClick={handleGoogleLogin}
       disabled={disabled || isLoading}
       className={`
-        w-full flex items-center justify-center gap-3 py-3.5 px-4
-        bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700
-        rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200
-        shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200
-        transition-colors duration-200 font-poppins
+        w-full flex items-center justify-center gap-3 h-[56px] px-4
+        bg-white border-2 border-slate-200 dark:border-slate-700
+        rounded-2xl text-[15px] font-bold text-slate-700
+        shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.1)]
+        focus:outline-none transition-all duration-300 font-poppins
         ${disabled || isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
       `}
     >

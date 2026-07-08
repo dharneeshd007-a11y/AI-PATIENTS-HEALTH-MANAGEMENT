@@ -21,12 +21,12 @@ const LoginPage = () => {
       </div>
 
       {/* LEFT PANEL: 60% Desktop Hero */}
-      <div className="lg:w-[60%] w-full h-[60vh] lg:h-screen">
+      <div className="lg:w-[60%] w-full min-h-[50vh] lg:h-screen">
         <HeroSection />
       </div>
 
       {/* RIGHT PANEL: 40% Desktop Auth Deck */}
-      <div className="lg:w-[40%] w-full h-[40vh] lg:h-screen flex items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
+      <div className="lg:w-[40%] w-full min-h-[50vh] lg:h-screen flex items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
         
         {/* Mobile styling gradients */}
         <div className="absolute lg:hidden top-0 right-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>

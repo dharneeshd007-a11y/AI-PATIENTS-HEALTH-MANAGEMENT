@@ -52,15 +52,15 @@ const Input = ({
           required={required}
           placeholder={placeholder || (label ? `Enter your ${label.toLowerCase()}` : '')}
           className={`
-            block w-full rounded-xl bg-white dark:bg-slate-900/60
+            block w-full rounded-2xl bg-white dark:bg-slate-900/60
             border-2 outline-none transition-all duration-300
-            ${Icon ? 'pl-10' : 'pl-4'} 
-            ${isPassword ? 'pr-10' : 'pr-4'} 
-            py-3 text-sm text-slate-800 dark:text-slate-100 font-medium
+            h-[56px] ${Icon ? 'pl-[44px]' : 'pl-5'} 
+            ${isPassword ? 'pr-[44px]' : 'pr-5'} 
+            text-[15px] text-slate-800 dark:text-slate-100 font-medium
             placeholder-slate-400/70 dark:placeholder-slate-500/50
             ${error 
               ? 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20' 
-              : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-600/20'
+              : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 focus:border-blue-600 dark:focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)]'
             }
           `}
           {...props}

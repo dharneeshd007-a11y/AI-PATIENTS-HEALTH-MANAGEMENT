@@ -62,14 +62,14 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-w-[430px] mx-auto z-10 font-poppins">
+    <div className="w-full lg:max-w-[500px] mx-auto z-10 font-poppins">
       <Toast {...toast} onClose={() => setToast(prev => ({ ...prev, isVisible: false }))} />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 p-8 rounded-[24px] shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]"
+        className="bg-white/10 backdrop-blur-xl border border-white/20 p-10 rounded-[24px] shadow-2xl h-auto min-h-fit"
       >
         {/* Header section */}
         <div className="mb-6 flex flex-col items-center sm:items-start text-center sm:text-left">
@@ -93,7 +93,7 @@ const LoginForm = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <Input
             label="Email"
             name="email"
@@ -115,7 +115,7 @@ const LoginForm = () => {
             error={errors.password}
           />
 
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer group">
               <input 
                 type="checkbox" 
@@ -131,27 +131,25 @@ const LoginForm = () => {
             </button>
           </div>
 
-          <div className="pt-2">
-            <Button 
-              type="submit" 
-              isLoading={status === 'loading' || status === 'success'} 
-              className="h-14 bg-gradient-to-r from-primary to-[#00428c] hover:from-[#00428c] hover:to-primary text-white text-[15px] shadow-lg hover:-translate-y-0.5 transition-transform w-full"
-            >
-              {status === 'success' ? 'Authenticated' : 'Sign In'}
-            </Button>
-          </div>
+          <Button 
+            type="submit" 
+            isLoading={status === 'loading' || status === 'success'} 
+            className="h-[56px] rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-600 hover:to-cyan-500 text-white text-[15px] font-bold hover:scale-105 hover:shadow-blue-500/40 transition-all duration-300 w-full flex items-center justify-center"
+          >
+            {status === 'success' ? 'Authenticated' : 'Sign In'}
+          </Button>
 
-          <div className="relative py-4 flex items-center">
+          <div className="flex items-center justify-center">
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-            <span className="flex-shrink-0 mx-4 text-xs font-bold text-slate-400 uppercase">OR</span>
+            <span className="px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">OR</span>
             <div className="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
           </div>
 
           <GoogleLoginButton disabled={status === 'loading' || status === 'success'} />
           
-          <div className="mt-6 text-center">
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-              Don't have an account?{' '}
+          <div className="text-center">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 flex flex-col gap-1">
+              <span>Don't have an account?</span>
               <a href="mailto:admin@hospital.com" className="font-semibold text-primary hover:underline">
                 Contact Administrator
               </a>
