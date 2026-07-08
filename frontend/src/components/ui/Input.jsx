@@ -11,6 +11,7 @@ const Input = ({
   onChange,
   name,
   required,
+  placeholder,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -18,19 +19,29 @@ const Input = ({
 
   const isPassword = type === 'password';
   const inputType = isPassword && showPassword ? 'text' : type;
-  const hasValue = value && value.length > 0;
-  const isActive = isFocused || hasValue;
 
   return (
-    <div className="w-full mb-4">
+    <div className="flex flex-col space-y-1.5 w-full font-poppins">
+      {/* Static Label to prevent any overlap */}
+      {label && (
+        <label className={`text-sm font-semibold transition-colors duration-200 ${
+          error ? 'text-red-500' : isFocused ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'
+        }`}>
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+      )}
+      
       <div className="relative">
-        <div 
-          className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-colors duration-200
-            ${error ? 'text-red-500' : isFocused ? 'text-primary' : 'text-slate-400 dark:text-slate-500'}`}
-        >
-          {Icon && <Icon size={18} />}
-        </div>
+        {/* Left Icon */}
+        {Icon && (
+          <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none transition-colors duration-200 ${
+            error ? 'text-red-500' : isFocused ? 'text-blue-600' : 'text-slate-400 dark:text-slate-500'
+          }`}>
+            <Icon size={18} />
+          </div>
+        )}
         
+        {/* Input Field - box-sizing border-box applied by Tailwind */}
         <input
           type={inputType}
           name={name}
@@ -39,52 +50,43 @@ const Input = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           required={required}
+          placeholder={placeholder || (label ? `Enter your ${label.toLowerCase()}` : '')}
           className={`
-            block w-full rounded-xl bg-white/50 dark:bg-slate-900/50 
+            block w-full rounded-xl bg-white dark:bg-slate-900/60
             border-2 outline-none transition-all duration-300
             ${Icon ? 'pl-10' : 'pl-4'} 
             ${isPassword ? 'pr-10' : 'pr-4'} 
-            pt-5 pb-2 text-sm text-slate-800 dark:text-slate-100 font-poppins
+            py-3 text-sm text-slate-800 dark:text-slate-100 font-medium
+            placeholder-slate-400/70 dark:placeholder-slate-500/50
             ${error 
               ? 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20' 
-              : 'border-slate-200 dark:border-slate-700/50 focus:border-primary focus:ring-4 focus:ring-primary/20'
+              : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-600/20'
             }
           `}
           {...props}
         />
         
-        <label
-          className={`
-            absolute left-0 transition-all duration-200 pointer-events-none
-            ${Icon ? 'ml-10' : 'ml-4'}
-            ${isActive 
-              ? '-translate-y-1.5 top-1.5 text-[0.65rem] font-medium uppercase tracking-wider' 
-              : 'translate-y-3.5 text-sm'
-            }
-            ${error ? 'text-red-500' : isFocused ? 'text-primary' : 'text-slate-500'}
-          `}
-        >
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-
+        {/* Right Icon for Password Toggle */}
         {isPassword && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-primary transition-colors focus:outline-none"
+            className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none"
+            aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
           </button>
         )}
       </div>
       
+      {/* Error Message */}
       <AnimatePresence>
         {error && (
           <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-red-500 text-xs mt-1 ml-1 font-medium font-poppins"
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginTop: 4 }}
+            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+            className="text-red-500 text-xs font-semibold"
           >
             {error}
           </motion.p>
