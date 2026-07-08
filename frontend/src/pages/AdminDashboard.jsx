@@ -87,7 +87,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate('/login');
+    window.location.href = '/';
   };
 
   return (
