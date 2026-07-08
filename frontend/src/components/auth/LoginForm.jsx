@@ -62,14 +62,14 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full lg:w-[480px] lg:max-w-[480px] mx-auto z-10 font-poppins">
+    <div className="w-full lg:w-[460px] lg:max-w-[460px] mx-auto z-10 font-poppins">
       <Toast {...toast} onClose={() => setToast(prev => ({ ...prev, isVisible: false }))} />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white/10 backdrop-blur-xl border border-white/20 p-[48px] rounded-[28px] shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6"
+        className="bg-white/10 backdrop-blur-xl border border-white/20 p-[48px] pt-[32px] pl-[32px] rounded-[28px] shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] flex flex-col"
       >
         {/* Header section */}
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left mb-2">
@@ -80,12 +80,12 @@ const LoginForm = () => {
             <span className="text-xl font-bold text-white">DKD Smart Hospital</span>
           </div>
           
-          <h2 className="text-[36px] font-bold text-white mb-2 leading-tight">Welcome Back</h2>
+          <h2 className="text-[40px] font-bold text-white mb-2 leading-tight">Welcome Back</h2>
           <p className="text-white/70 text-sm font-medium">Sign in to continue</p>
         </div>
 
         {/* Live Clock & SSL Badge */}
-        <div className="flex justify-between items-center border-b border-white/10 pb-4">
+        <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-6">
           <div className="text-white/80 text-xs font-semibold">
             {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
           </div>
@@ -95,9 +95,9 @@ const LoginForm = () => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-[24px]">
           <Input
-            label=""
+            label="Email"
             name="email"
             type="email"
             icon={FiMail}
@@ -108,7 +108,7 @@ const LoginForm = () => {
           />
 
           <Input
-            label=""
+            label="Password"
             name="password"
             type="password"
             icon={FiLock}
@@ -134,27 +134,36 @@ const LoginForm = () => {
             </button>
           </div>
 
-          <Button 
-            type="submit" 
-            isLoading={status === 'loading' || status === 'success'} 
-            className="h-[56px] rounded-full bg-gradient-to-r from-[#0057B8] to-[#00B4D8] hover:shadow-[0_0_20px_rgba(0,180,216,0.4)] text-white text-[18px] font-bold transition-all duration-300 w-full flex items-center justify-center border border-white/10"
-          >
-            {status === 'success' ? 'Authenticated' : 'Sign In'}
-          </Button>
+          <div className="mt-2">
+            <Button 
+              type="submit" 
+              isLoading={status === 'loading' || status === 'success'} 
+              className="h-[56px] rounded-full bg-gradient-to-r from-[#0057B8] to-[#00B4D8] hover:shadow-[0_0_20px_rgba(0,180,216,0.4)] text-white text-[18px] font-bold transition-all duration-300 w-full flex items-center justify-center border border-white/10"
+            >
+              {status === 'success' ? 'Authenticated' : 'Sign In'}
+            </Button>
+          </div>
 
-          <div className="my-2 flex items-center before:flex-1 before:border-t before:border-white/20 after:flex-1 after:border-t after:border-white/20">
-            <span className="px-4 text-xs font-bold text-white/50 uppercase tracking-widest">OR</span>
+          <div className="my-5 flex justify-center relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/20"></div>
+            </div>
+            <div className="relative bg-[#071B2F]/10 px-4">
+              <span className="text-xs font-bold text-white/50 uppercase tracking-widest bg-transparent">OR</span>
+            </div>
           </div>
 
           <GoogleLoginButton disabled={status === 'loading' || status === 'success'} />
         </form>
         
         {/* Footer */}
-        <div className="mt-8 text-center text-xs font-medium text-white/50 flex flex-col gap-1">
-          <p>
-            Need Help? <a href="mailto:support@dkdhospital.com" className="text-[#00B4D8] hover:text-white transition-colors">Contact Administrator</a>
-          </p>
-          <p className="mt-2">© 2026 DKD Smart Hospital.<br/>All Rights Reserved.</p>
+        <div className="mt-10 mb-2 flex justify-center">
+          <div className="text-center text-xs font-medium text-white/50 flex flex-col gap-1 w-full">
+            <p>
+              Need Help? <a href="mailto:support@dkdhospital.com" className="text-[#00B4D8] hover:text-white transition-colors">Contact Administrator</a>
+            </p>
+            <p className="mt-2">© 2026 DKD Smart Hospital.<br/>All Rights Reserved.</p>
+          </div>
         </div>
       </motion.div>
     </div>

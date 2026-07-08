@@ -25,7 +25,7 @@ const Input = ({
       {/* Static Label to prevent any overlap */}
       {label && (
         <label className={`text-sm font-semibold transition-colors duration-200 ${
-          error ? 'text-red-500' : isFocused ? 'text-blue-600 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300'
+          error ? 'text-red-500' : isFocused ? 'text-[#00B4D8]' : 'text-white/80'
         }`}>
           {label} {required && <span className="text-red-500">*</span>}
         </label>
