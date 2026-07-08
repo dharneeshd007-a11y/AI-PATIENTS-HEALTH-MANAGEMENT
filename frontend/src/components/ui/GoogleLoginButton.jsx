@@ -16,9 +16,9 @@ const GoogleLoginButton = ({ disabled, isLoading }) => {
       disabled={disabled || isLoading}
       className={`
         w-full flex items-center justify-center gap-3 h-[56px] px-4
-        bg-white border-2 border-slate-200 dark:border-slate-700
-        rounded-2xl text-[15px] font-bold text-slate-700
-        shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.1)]
+        bg-white border-none
+        rounded-full text-[16px] font-bold text-slate-800
+        shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.2)]
         focus:outline-none transition-all duration-300 font-poppins
         ${disabled || isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
       `}

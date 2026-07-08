@@ -62,32 +62,34 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full lg:w-[500px] lg:max-w-[500px] mx-auto z-10 font-poppins">
+    <div className="w-full lg:w-[480px] lg:max-w-[480px] mx-auto z-10 font-poppins">
       <Toast {...toast} onClose={() => setToast(prev => ({ ...prev, isVisible: false }))} />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-white/10 backdrop-blur-xl border border-white/20 p-10 rounded-3xl shadow-2xl space-y-6"
+        className="bg-white/10 backdrop-blur-xl border border-white/20 p-[48px] rounded-[28px] shadow-[0_8px_32px_0_rgba(0,0,0,0.15)] space-y-6"
       >
         {/* Header section */}
-        <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+        <div className="flex flex-col items-center sm:items-start text-center sm:text-left mb-2">
           <div className="flex items-center gap-3 mb-4 lg:hidden">
-            <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
-              <FiPlus size={24} strokeWidth={3} />
+            <div className="bg-gradient-to-br from-[#0057B8] to-[#0A2540] p-2.5 rounded-xl shadow-md border border-white/10">
+              <FiPlus className="text-white w-6 h-6 stroke-[3]" />
             </div>
-            <span className="text-xl font-bold text-slate-800 dark:text-white">DKD Smart Hospital</span>
+            <span className="text-xl font-bold text-white">DKD Smart Hospital</span>
           </div>
           
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome Back</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Sign in to continue</p>
+          <h2 className="text-[36px] font-bold text-white mb-2 leading-tight">Welcome Back</h2>
+          <p className="text-white/70 text-sm font-medium">Sign in to continue</p>
         </div>
 
         {/* Live Clock & SSL Badge */}
-        <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4">
-          <LiveClock />
-          <div className="flex items-center gap-1 text-xs font-semibold text-success bg-success/10 px-2 py-1 rounded-md">
+        <div className="flex justify-between items-center border-b border-white/10 pb-4">
+          <div className="text-white/80 text-xs font-semibold">
+            {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          </div>
+          <div className="flex items-center gap-1 text-xs font-semibold text-green-400 bg-green-500/10 px-2 py-1 rounded-md border border-green-500/20">
             <FiShield /> Secure SSL
           </div>
         </div>
@@ -95,7 +97,7 @@ const LoginForm = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <Input
-            label="Email"
+            label=""
             name="email"
             type="email"
             icon={FiMail}
@@ -106,27 +108,28 @@ const LoginForm = () => {
           />
 
           <Input
-            label="Password"
+            label=""
             name="password"
             type="password"
             icon={FiLock}
             value={formData.password}
             onChange={handleChange}
             error={errors.password}
+            placeholder="Password"
           />
 
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center px-1">
             <label className="flex items-center gap-2 cursor-pointer group">
               <input 
                 type="checkbox" 
-                className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-800"
+                className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#00B4D8] focus:ring-[#00B4D8]"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
               />
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Remember Me</span>
+              <span className="text-sm font-medium text-white/80">Remember Me</span>
             </label>
             
-            <button type="button" onClick={() => showToast('Reset instructions sent to email.', 'success')} className="text-sm font-semibold text-primary hover:text-blue-700 transition-colors">
+            <button type="button" onClick={() => showToast('Reset instructions sent to email.', 'success')} className="text-sm font-semibold text-[#00B4D8] hover:text-white transition-colors">
               Forgot Password?
             </button>
           </div>
@@ -134,30 +137,24 @@ const LoginForm = () => {
           <Button 
             type="submit" 
             isLoading={status === 'loading' || status === 'success'} 
-            className="h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-600 hover:to-cyan-500 text-white text-[15px] font-bold hover:scale-105 hover:shadow-blue-500/40 transition-all duration-300 w-full flex items-center justify-center"
+            className="h-[56px] rounded-full bg-gradient-to-r from-[#0057B8] to-[#00B4D8] hover:shadow-[0_0_20px_rgba(0,180,216,0.4)] text-white text-[18px] font-bold transition-all duration-300 w-full flex items-center justify-center border border-white/10"
           >
             {status === 'success' ? 'Authenticated' : 'Sign In'}
           </Button>
 
-          <div className="my-6 flex items-center before:flex-1 before:border-t before:border-slate-200 before:dark:border-slate-700 after:flex-1 after:border-t after:border-slate-200 after:dark:border-slate-700">
-            <span className="px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">OR</span>
+          <div className="my-2 flex items-center before:flex-1 before:border-t before:border-white/20 after:flex-1 after:border-t after:border-white/20">
+            <span className="px-4 text-xs font-bold text-white/50 uppercase tracking-widest">OR</span>
           </div>
 
           <GoogleLoginButton disabled={status === 'loading' || status === 'success'} />
-          
-          <div className="text-center">
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 flex flex-col gap-1">
-              <span>Don't have an account?</span>
-              <a href="mailto:admin@dkdhospital.com" className="font-semibold text-primary hover:underline">
-                Contact Administrator
-              </a>
-            </p>
-          </div>
         </form>
         
         {/* Footer */}
-        <div className="mt-6 text-center text-xs font-medium text-slate-500 dark:text-slate-500">
-          <p>© 2026 DKD Smart Hospital. All Rights Reserved.</p>
+        <div className="mt-8 text-center text-xs font-medium text-white/50 flex flex-col gap-1">
+          <p>
+            Need Help? <a href="mailto:support@dkdhospital.com" className="text-[#00B4D8] hover:text-white transition-colors">Contact Administrator</a>
+          </p>
+          <p className="mt-2">© 2026 DKD Smart Hospital.<br/>All Rights Reserved.</p>
         </div>
       </motion.div>
     </div>

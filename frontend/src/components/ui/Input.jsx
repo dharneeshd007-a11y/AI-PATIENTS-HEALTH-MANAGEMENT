@@ -52,15 +52,15 @@ const Input = ({
           required={required}
           placeholder={placeholder || (label ? `Enter your ${label.toLowerCase()}` : '')}
           className={`
-            block w-full rounded-2xl bg-white dark:bg-slate-900/60
-            border-2 outline-none transition-all duration-300
-            h-14 ${Icon ? 'pl-12' : 'pl-5'} 
+            block w-full rounded-2xl bg-[#061422]/50 backdrop-blur-sm
+            border border-white/10 outline-none transition-all duration-300
+            h-[56px] ${Icon ? 'pl-12' : 'pl-5'} 
             ${isPassword ? 'pr-12' : 'pr-5'} 
-            text-[15px] text-slate-800 dark:text-slate-100 font-medium
-            placeholder-slate-400/70 dark:placeholder-slate-500/50
+            text-[16px] text-white font-medium
+            placeholder-white/40
             ${error 
-              ? 'border-red-500 focus:border-red-500 focus:ring-4 focus:ring-red-500/20' 
-              : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 focus:border-blue-600 dark:focus:border-blue-500 focus:shadow-[0_0_15px_rgba(37,99,235,0.2)]'
+              ? 'border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20' 
+              : 'hover:border-white/30 focus:border-[#00B4D8] focus:shadow-[0_0_15px_rgba(0,180,216,0.2)]'
             }
           `}
           {...props}
