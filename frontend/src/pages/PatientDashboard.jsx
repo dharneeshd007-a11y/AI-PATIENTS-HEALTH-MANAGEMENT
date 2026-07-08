@@ -12,9 +12,6 @@ const PatientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [alerts, setAlerts] = useState([]);
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  
-  const patientType = user?.patient_type || 'OP';
 
   useEffect(() => {
     const fetchMyData = async () => {
@@ -40,10 +37,6 @@ const PatientDashboard = () => {
           (a.patient_name === user?.full_name || a.patient === user?.full_name)
         );
         setAlerts(myCriticalAlerts.slice(0, 3));
-
-        // Fetch appointments
-        const aptRes = await axios.get(`/api/appointments/${user?.id}/${user?.role}`);
-        setUpcomingAppointments(aptRes.data.slice(0, 3));
       } catch (err) {
         console.error(err);
         setError("Could not find medical records linked to this account name. (Hint: Try registering as 'John Doe' or 'Jane Smith')");
@@ -88,7 +81,7 @@ const PatientDashboard = () => {
 
   const handleLogout = () => {
     authService.logout();
-    window.location.href = '/';
+    navigate('/login');
   };
 
   return (
@@ -98,7 +91,7 @@ const PatientDashboard = () => {
         <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
       </div>
 
-      {patientType === 'ICU' && alerts.length > 0 && (
+      {alerts.length > 0 && (
         <div style={{ marginBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           {alerts.map(alert => (
             <div key={alert.id} style={{ 
@@ -117,45 +110,6 @@ const PatientDashboard = () => {
         </div>
       )}
 
-      {patientType === 'OP' && upcomingAppointments.length > 0 && (
-        <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto 2rem auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>Upcoming Appointments</h3>
-            <button className="btn btn-outline" onClick={() => navigate('/appointments')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}>View All</button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            {upcomingAppointments.map(apt => (
-              <div key={apt.id} style={{ padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <div style={{ fontWeight: 600 }}>{new Date(apt.appointment_date).toLocaleDateString()}</div>
-                  <div style={{ fontSize: '0.85rem', padding: '2px 8px', borderRadius: '12px', 
-                    background: apt.status === 'Approved' ? 'rgba(34, 197, 94, 0.2)' : apt.status === 'Rejected' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(234, 179, 8, 0.2)',
-                    color: apt.status === 'Approved' ? '#4ade80' : apt.status === 'Rejected' ? '#f87171' : '#facc15'
-                  }}>
-                    {apt.status}
-                  </div>
-                </div>
-                <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                  <div style={{ marginBottom: '4px' }}><strong>Doctor:</strong> {apt.doctor_name || (apt.doctor_id ? `Dr. ID ${apt.doctor_id}` : 'Unassigned')}</div>
-                  <div style={{ marginBottom: '4px' }}><strong>Reason:</strong> {apt.reason}</div>
-                  {apt.status === 'Approved' && <div style={{ marginBottom: '4px' }}><strong>Assigned Time:</strong> {apt.appointment_time}</div>}
-                  {apt.status === 'Rejected' && <div style={{ marginBottom: '4px' }}><strong>Reason:</strong> {apt.rejection_reason}</div>}
-                  {apt.status === 'Pending' && <div style={{ color: '#facc15', marginTop: '4px' }}>Waiting for Doctor to assign a time</div>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {patientType === 'OP' && upcomingAppointments.length === 0 && !loading && !error && (
-        <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto 2rem auto', textAlign: 'center', padding: '3rem 1rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>No Upcoming Appointments</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>You don't have any appointments scheduled.</p>
-          <button className="btn btn-primary" onClick={() => navigate('/appointments')}>Book an Appointment</button>
-        </div>
-      )}
-
       {loading ? (
         <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>Loading your health summary...</div>
       ) : error ? (
@@ -164,9 +118,9 @@ const PatientDashboard = () => {
           <h3>No Records Found</h3>
           <p>{error}</p>
         </div>
-      ) : patientType === 'ICU' && (
+      ) : (
         <div className="glass-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>ICU Live Telemetry</h3>
+          <h3 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Personal Health Summary</h3>
           
           <div style={{ display: 'flex', justifyContent: 'space-around', margin: '2rem 0', padding: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)' }}>
             <div style={{ textAlign: 'center' }}>
@@ -196,8 +150,7 @@ const PatientDashboard = () => {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <button className="btn btn-primary" onClick={() => navigate(`/live-monitoring?patientId=${patientData.id}`)} style={{ padding: '1rem' }}>Enter Live Monitoring</button>
-            <button className="btn btn-outline" onClick={() => navigate(`/ecg-analysis?patientId=${patientData.id}`)} style={{ padding: '1rem' }}>View Live ECG Feed</button>
-            <button className="btn btn-outline" onClick={() => navigate(`/generate-pdf?patientId=${patientData.id}`)} style={{ padding: '1rem', border: '1px solid #3b82f6', color: '#3b82f6' }}>Generate PDF Medical Report</button>
+            <button className="btn btn-outline" onClick={() => navigate(`/ecg-analysis?patientId=${patientData.id}`)} style={{ padding: '1rem' }}>View ECG Report</button>
           </div>
         </div>
       )}

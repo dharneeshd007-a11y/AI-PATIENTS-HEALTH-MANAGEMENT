@@ -10,22 +10,17 @@ const DoctorDashboard = () => {
   const user = authService.getCurrentUser()?.user;
   const [metrics, setMetrics] = useState({ assignedPatients: 0, activeAlerts: 0, todaysMonitoring: 0 });
   const [alerts, setAlerts] = useState([]);
-  const [pendingAppointments, setPendingAppointments] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [patientsRes, alertsRes, aptRes] = await Promise.all([
+        const [patientsRes, alertsRes] = await Promise.all([
           axios.get('/api/patients'),
-          axios.get('/api/alerts'),
-          axios.get(`/api/appointments/${user?.id}/${user?.role}`)
+          axios.get('/api/alerts')
         ]);
         
         const criticalAlerts = alertsRes.data.filter(a => a.severity === 'Critical' && !a.resolved);
         setAlerts(criticalAlerts.slice(0, 3));
-        
-        const pending = aptRes.data.filter(a => a.status === 'Pending');
-        setPendingAppointments(pending.slice(0, 3));
         
         setMetrics({
           assignedPatients: patientsRes.data.length, // Assume all for demo, real app would filter by doctor_id
@@ -54,7 +49,7 @@ const DoctorDashboard = () => {
 
   const handleLogout = () => {
     authService.logout();
-    window.location.href = '/';
+    navigate('/login');
   };
 
   return (
@@ -115,41 +110,6 @@ const DoctorDashboard = () => {
           </div>
         </div>
       </div>
-
-      {pendingAppointments.length > 0 && (
-        <div className="glass-card" style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0 }}>Pending Appointments</h3>
-            <button className="btn btn-outline" onClick={() => navigate('/appointments')} style={{ padding: '0.5rem 1rem' }}>Manage All</button>
-          </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                  <th style={{ padding: '0.8rem' }}>Patient Name</th>
-                  <th style={{ padding: '0.8rem' }}>Date</th>
-                  <th style={{ padding: '0.8rem' }}>Reason</th>
-                  <th style={{ padding: '0.8rem' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pendingAppointments.map(apt => (
-                  <tr key={apt.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <td style={{ padding: '0.8rem' }}>{apt.patient_name || `ID: ${apt.patient_id}`}</td>
-                    <td style={{ padding: '0.8rem' }}>{new Date(apt.appointment_date).toLocaleDateString()}</td>
-                    <td style={{ padding: '0.8rem' }}>{apt.reason}</td>
-                    <td style={{ padding: '0.8rem' }}>
-                      <span style={{ padding: '4px 8px', borderRadius: '12px', fontSize: '0.85rem', background: 'rgba(234, 179, 8, 0.2)', color: '#facc15' }}>
-                        Pending
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
       
       <div style={{ display: 'flex', gap: '1rem' }}>
         <button className="btn btn-primary" onClick={() => navigate('/live-monitoring')} style={{ flex: 1, padding: '1.5rem', fontSize: '1.1rem' }}>Enter Live Monitoring</button>

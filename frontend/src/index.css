@@ -1,18 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
-
-@import "tailwindcss";
-
-@theme {
-  --color-primary: #0057B8;
-  --color-secondary: #0A2540;
-  --color-accent: #00B4D8;
-  --color-success: #16A34A;
-  --color-danger: #DC2626;
-  --color-background: #071B2F;
-  --color-dark: #0A2540;
-  --font-poppins: "Poppins", sans-serif;
-  --radius-xl: 20px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
   --bg-color: #0a0e17;
