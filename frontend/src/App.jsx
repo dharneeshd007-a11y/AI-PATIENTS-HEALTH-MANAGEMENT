@@ -6,7 +6,7 @@ import MedicationReminder from './components/MedicationReminder';
 import GlobalNotifications from './components/GlobalNotifications';
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
-import Login from './pages/Login';
+import LoginPage from './pages/LoginPage';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
@@ -65,8 +65,9 @@ const AppLayout = ({ children }) => {
 function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/" element={<LoginPage />} />
       
       {/* Protected Routes */}
       <Route path="/admin-dashboard" element={

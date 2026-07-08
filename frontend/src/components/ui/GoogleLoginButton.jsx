@@ -2,13 +2,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FcGoogle } from 'react-icons/fc';
 
-const GoogleButton = ({ onClick, disabled, isLoading }) => {
+const GoogleLoginButton = ({ disabled, isLoading }) => {
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/google`;
+  };
+
   return (
     <motion.button
       whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
       whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
       type="button"
-      onClick={onClick}
+      onClick={handleGoogleLogin}
       disabled={disabled || isLoading}
       className={`
         w-full flex items-center justify-center gap-3 py-3.5 px-4
@@ -26,4 +30,4 @@ const GoogleButton = ({ onClick, disabled, isLoading }) => {
   );
 };
 
-export default GoogleButton;
+export default GoogleLoginButton;
