@@ -19,15 +19,19 @@ async function migrate() {
       if (e.code !== 'ER_DUP_FIELDNAME') console.log(e.message);
     }
 
-    try {
-      console.log("Adding missing admin patients columns...");
-      await connection.query('ALTER TABLE patients ADD COLUMN patient_type VARCHAR(50) DEFAULT "ICU"');
-      await connection.query('ALTER TABLE patients ADD COLUMN room_no VARCHAR(50) DEFAULT NULL');
-      await connection.query('ALTER TABLE patients ADD COLUMN bed_no VARCHAR(50) DEFAULT NULL');
-      await connection.query('ALTER TABLE patients ADD COLUMN ward VARCHAR(100) DEFAULT NULL');
-      await connection.query('ALTER TABLE patients ADD COLUMN assigned_doctor_id INT DEFAULT NULL');
-    } catch (e) {
-      console.log("Columns might already exist:", e.message);
+    const columnsToAdd = [
+      'ADD COLUMN patient_type VARCHAR(50) DEFAULT "ICU"',
+      'ADD COLUMN room_no VARCHAR(50) DEFAULT NULL',
+      'ADD COLUMN bed_no VARCHAR(50) DEFAULT NULL',
+      'ADD COLUMN ward VARCHAR(100) DEFAULT NULL',
+      'ADD COLUMN assigned_doctor_id INT DEFAULT NULL'
+    ];
+    for (let col of columnsToAdd) {
+      try {
+        await connection.query(`ALTER TABLE patients ${col}`);
+      } catch (e) {
+        if (e.code !== 'ER_DUP_FIELDNAME') console.log(e.message);
+      }
     }
 
     try {
