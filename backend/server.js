@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 // Database Configuration
 // Run migrations on startup to ensure DB schema is up to date
-require('./migrate');
+require('./migrate')().catch(console.error);
 
 const db = require('./config/db');
 
@@ -74,6 +74,21 @@ app.use('/api/patients', patientRoutes);
 app.use('/api/admin/patients', adminPatientRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/auth', authRoutes);
+
+// Routes
+app.get('/api/migrate', async (req, res) => {
+  try {
+    const migrate = require('./migrate');
+    await migrate();
+    res.json({ message: 'Migration executed successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+    res.status(500).json({ error: error.message, stack: error.stack });
+  }
+});
+
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/medications', medicationRoutes);
