@@ -69,17 +69,19 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Username</label>
-            <input 
-              type="text" 
-              name="full_name" 
-              required 
-              value={formData.full_name} 
-              onChange={handleChange} 
-              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
-            />
-          </div>
+          {!isLogin && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Full Name</label>
+              <input 
+                type="text" 
+                name="full_name" 
+                required={!isLogin} 
+                value={formData.full_name} 
+                onChange={handleChange} 
+                style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+              />
+            </div>
+          )}
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Phone Number</label>
@@ -94,17 +96,19 @@ const Login = () => {
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Email</label>
-            <input 
-              type="email" 
-              name="email" 
-              required 
-              value={formData.email} 
-              onChange={handleChange} 
-              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
-            />
-          </div>
+          {!isLogin && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Email</label>
+              <input 
+                type="email" 
+                name="email" 
+                required={!isLogin} 
+                value={formData.email} 
+                onChange={handleChange} 
+                style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+              />
+            </div>
+          )}
 
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Password</label>
@@ -118,19 +122,21 @@ const Login = () => {
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Login As</label>
-            <select 
-              name="role" 
-              value={formData.role} 
-              onChange={handleChange}
-              style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
-            >
-              <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
-              <option value="Patient" style={{ color: 'black' }}>Patient</option>
-              <option value="Admin" style={{ color: 'black' }}>Admin</option>
-            </select>
-          </div>
+          {!isLogin && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Register As</label>
+              <select 
+                name="role" 
+                value={formData.role} 
+                onChange={handleChange}
+                style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+              >
+                <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
+                <option value="Patient" style={{ color: 'black' }}>Patient</option>
+                <option value="Admin" style={{ color: 'black' }}>Admin</option>
+              </select>
+            </div>
+          )}
 
           <button type="submit" className="btn btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }} disabled={loading}>
             {loading ? (isLogin ? 'Logging in...' : 'Registering...') : (isLogin ? 'Login' : 'Register')}
