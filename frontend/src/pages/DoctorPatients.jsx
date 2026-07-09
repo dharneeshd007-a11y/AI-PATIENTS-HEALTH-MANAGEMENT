@@ -14,7 +14,9 @@ const DoctorPatients = () => {
     const fetchPatients = async () => {
       try {
         const response = await axios.get('/api/patients');
-        setPatients(response.data);
+        // Filter patients by the logged-in doctor's ID
+        const myPatients = response.data.filter(p => p.assigned_doctor_id == user?.id);
+        setPatients(myPatients);
       } catch (error) {
         console.error("Error fetching patients:", error);
       }

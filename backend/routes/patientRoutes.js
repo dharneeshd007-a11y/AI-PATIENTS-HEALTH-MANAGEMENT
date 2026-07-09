@@ -86,11 +86,11 @@ router.get('/', async (req, res) => {
 
 // Create a new patient
 router.post('/', async (req, res) => {
-  const { name, age, gender, room, status, mrn, phone, doctor_name } = req.body;
+  const { name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
   try {
     const [result] = await db.query(
-      'INSERT INTO patients (name, age, gender, room, status, mrn, phone, doctor_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, age, gender, room, status || 'Stable', mrn, phone || null, doctor_name || null]
+      'INSERT INTO patients (name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, age, gender, room, status || 'Stable', mrn, phone || null, doctor_name || null, assigned_doctor_id || null]
     );
     
     if (status === 'Critical') {
@@ -109,11 +109,11 @@ router.post('/', async (req, res) => {
 
 // Update a patient
 router.put('/:id', async (req, res) => {
-  const { name, age, gender, room, status, mrn, phone, doctor_name } = req.body;
+  const { name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
   try {
     await db.query(
-      'UPDATE patients SET name = ?, age = ?, gender = ?, room = ?, status = ?, mrn = ?, phone = ?, doctor_name = ? WHERE id = ?',
-      [name, age, gender, room, status, mrn, phone || null, doctor_name || null, req.params.id]
+      'UPDATE patients SET name = ?, age = ?, gender = ?, room = ?, status = ?, mrn = ?, phone = ?, doctor_name = ?, assigned_doctor_id = ? WHERE id = ?',
+      [name, age, gender, room, status, mrn, phone || null, doctor_name || null, assigned_doctor_id || null, req.params.id]
     );
 
     // Automatically sync the phone number update to the user's login account if they have one
