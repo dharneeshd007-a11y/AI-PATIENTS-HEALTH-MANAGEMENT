@@ -110,7 +110,9 @@ const AdminDashboard = () => {
                     {u.role}
                   </span>
                 </td>
-                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{u.phone}</td>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>
+                  {u.phone?.startsWith('G-') ? <span style={{ color: 'var(--accent-blue)', fontSize: '0.9rem' }}>Linked via Google</span> : u.phone}
+                </td>
                 <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                   <button 
                     onClick={async () => {
