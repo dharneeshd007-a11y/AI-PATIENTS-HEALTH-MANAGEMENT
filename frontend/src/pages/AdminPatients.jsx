@@ -19,7 +19,6 @@ const AdminPatients = () => {
     try {
       // Build query string
       let url = '/api/admin/patients?';
-      if (filterType !== 'All') url += `type=${filterType}&`;
       if (filterStatus !== 'All') url += `status=${filterStatus}`;
 
       const [patientsRes, usersRes] = await Promise.all([
@@ -235,29 +234,14 @@ const AdminPatients = () => {
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.age} yrs • {p.gender} • {p.phone}</div>
                 </td>
                 <td style={{ padding: '1rem' }}>
-                  {p.patient_type === 'ICU' ? (
-                    <span className="badge badge-pulse" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', display: 'inline-block' }}>🟥 ICU</span>
-                  ) : (
-                    <span className="badge" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', display: 'inline-block' }}>🟦 OP</span>
-                  )}
+                  <span className="badge badge-pulse" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', display: 'inline-block' }}>🟥 ICU</span>
                 </td>
                 <td style={{ padding: '1rem', color: 'var(--accent-cyan)' }}>Dr. {p.doctor_name || 'Unassigned'}</td>
                 <td style={{ padding: '1rem' }}>
-                  {p.patient_type === 'ICU' ? (
                     <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                       <div><strong>Ward:</strong> {p.ward || '--'}</div>
                       <div><strong>Room:</strong> {p.room_no || '--'} | <strong>Bed:</strong> {p.bed_no || '--'}</div>
                     </div>
-                  ) : (
-                    <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                      {p.next_appointment_date ? (
-                        <>
-                          <div><strong>Appt:</strong> {new Date(p.next_appointment_date).toLocaleDateString()}</div>
-                          <div><strong>Time:</strong> {p.next_appointment_time || '--'}</div>
-                        </>
-                      ) : 'No Upcoming Appts'}
-                    </div>
-                  )}
                 </td>
                 <td style={{ padding: '1rem' }}>
                   <span style={{ 
@@ -270,9 +254,7 @@ const AdminPatients = () => {
                 </td>
                 <td style={{ padding: '1rem', textAlign: 'right' }}>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                    {p.patient_type === 'ICU' && (
-                      <button onClick={() => navigate(`/live-monitoring?patientId=${p.id}`)} title="Live Monitoring" className="action-btn" style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer' }}><Activity size={18} /></button>
-                    )}
+                    <button onClick={() => navigate(`/live-monitoring?patientId=${p.id}`)} title="Live Monitoring" className="action-btn" style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer' }}><Activity size={18} /></button>
                     <button onClick={() => navigate(`/medications?patientId=${p.id}`)} title="Medical Records" className="action-btn" style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><FileText size={18} /></button>
                     <div style={{ width: '1px', backgroundColor: 'var(--glass-border)', margin: '0 5px' }}></div>
                     <button onClick={() => startEdit(p)} title="Edit Patient" className="action-btn" style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer' }}><Edit size={18} /></button>
