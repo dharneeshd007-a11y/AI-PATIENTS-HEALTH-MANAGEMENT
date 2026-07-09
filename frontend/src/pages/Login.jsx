@@ -31,6 +31,8 @@ const Login = () => {
         navigate('/admin-dashboard');
       } else if (data.user.role === 'Doctor') {
         navigate('/doctor-dashboard');
+      } else {
+        navigate('/patient-dashboard');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check credentials.');
@@ -110,6 +112,7 @@ const Login = () => {
               style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
             >
               <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
+              <option value="Patient" style={{ color: 'black' }}>Patient</option>
               <option value="Admin" style={{ color: 'black' }}>Admin</option>
             </select>
           </div>
