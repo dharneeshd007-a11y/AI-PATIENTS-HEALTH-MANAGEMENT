@@ -16,8 +16,36 @@ async function migrate() {
       console.log("Adding mrn to patients table...");
       await connection.query('ALTER TABLE patients ADD COLUMN mrn VARCHAR(50) DEFAULT NULL');
     } catch (e) {
-      if (e.code !== 'ER_DUP_FIELDNAME') throw e;
-      console.log("mrn column already exists.");
+      if (e.code !== 'ER_DUP_FIELDNAME') console.log(e.message);
+    }
+
+    try {
+      console.log("Adding missing admin patients columns...");
+      await connection.query('ALTER TABLE patients ADD COLUMN patient_type VARCHAR(50) DEFAULT "ICU"');
+      await connection.query('ALTER TABLE patients ADD COLUMN room_no VARCHAR(50) DEFAULT NULL');
+      await connection.query('ALTER TABLE patients ADD COLUMN bed_no VARCHAR(50) DEFAULT NULL');
+      await connection.query('ALTER TABLE patients ADD COLUMN ward VARCHAR(100) DEFAULT NULL');
+      await connection.query('ALTER TABLE patients ADD COLUMN assigned_doctor_id INT DEFAULT NULL');
+    } catch (e) {
+      console.log("Columns might already exist:", e.message);
+    }
+
+    try {
+      console.log("Creating appointments table if missing...");
+      await connection.query(`
+        CREATE TABLE IF NOT EXISTS appointments (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          patient_id INT,
+          doctor_id INT,
+          appointment_date DATE,
+          appointment_time TIME,
+          status VARCHAR(50) DEFAULT 'Scheduled',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
+        );
+      `);
+    } catch (e) {
+      console.log("Appointments table error:", e.message);
     }
     
     // Auto-generate some MRNs for existing patients
