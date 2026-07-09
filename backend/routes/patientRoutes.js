@@ -143,7 +143,7 @@ router.put('/:id', async (req, res) => {
     res.json({ message: 'Patient updated successfully' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Server error updating patient' });
+    res.status(500).json({ message: 'Server error updating patient', error: err.message, stack: err.stack });
   }
 });
 
