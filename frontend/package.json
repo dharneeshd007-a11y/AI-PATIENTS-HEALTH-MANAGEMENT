@@ -13,8 +13,11 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@tsparticles/react": "^4.3.1",
+    "@tsparticles/slim": "^4.3.1",
     "axios": "^1.17.0",
     "framer-motion": "^12.42.2",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
