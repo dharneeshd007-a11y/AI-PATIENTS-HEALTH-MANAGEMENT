@@ -11,7 +11,7 @@ const AdminPatients = () => {
   const [doctors, setDoctors] = useState([]);
   
   // Filters and Pagination
-  const [filterType, setFilterType] = useState('All');
+  const [filterType, setFilterType] = useState('ICU');
   const [filterStatus, setFilterStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -88,7 +88,7 @@ const AdminPatients = () => {
   const resetForm = () => {
     setFormData({ 
       name: '', age: '', gender: 'Male', phone: '', 
-      patient_type: 'OP', status: 'Stable', mrn: '',
+      patient_type: 'ICU', status: 'Stable', mrn: '',
       room_no: '', bed_no: '', ward: '', assigned_doctor_id: '' 
     });
   };
@@ -100,7 +100,7 @@ const AdminPatients = () => {
       age: patient.age,
       gender: patient.gender,
       phone: patient.phone || '',
-      patient_type: patient.patient_type || 'OP',
+      patient_type: patient.patient_type || 'ICU',
       status: patient.status || 'Stable',
       mrn: patient.mrn || '',
       room_no: patient.room_no || '',
@@ -111,17 +111,18 @@ const AdminPatients = () => {
     setShowForm(false);
   };
 
-  const filteredSearch = patients.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (p.mrn && p.mrn.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredSearch = patients.filter(p => {
+    const name = p.name || p.full_name || '';
+    return name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           (p.mrn && p.mrn.toLowerCase().includes(searchQuery.toLowerCase()));
+  });
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Full Patient Management</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Complete control over ICU and OP patient registries</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Complete control over ICU patient registries</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setEditPatientId(null); resetForm(); }} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <UserPlus size={18} /> {showForm ? 'Cancel' : 'Add New Patient'}
@@ -130,7 +131,7 @@ const AdminPatients = () => {
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: '10px' }}>
-          {['All', 'ICU', 'OP'].map(type => (
+          {['ICU'].map(type => (
             <button key={type} onClick={() => setFilterType(type)} className={filterType === type ? 'btn btn-primary' : 'btn btn-outline'} style={{ padding: '0.4rem 1rem' }}>
               {type} Patients
             </button>
@@ -174,7 +175,6 @@ const AdminPatients = () => {
             
             {/* Classification */}
             <select value={formData.patient_type} onChange={e => setFormData({...formData, patient_type: e.target.value})} className="input-field" style={{ flex: '1 1 120px', fontWeight: 'bold' }}>
-              <option value="OP">OP Patient</option>
               <option value="ICU">ICU Patient</option>
             </select>
 
@@ -231,7 +231,7 @@ const AdminPatients = () => {
                 <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>PT-{1000 + p.id}</td>
                 <td style={{ padding: '1rem', fontWeight: 'bold' }}>{p.mrn || 'N/A'}</td>
                 <td style={{ padding: '1rem' }}>
-                  <div style={{ fontWeight: 600 }}>{p.name}</div>
+                  <div style={{ fontWeight: 600 }}>{p.full_name || p.name}</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.age} yrs • {p.gender} • {p.phone}</div>
                 </td>
                 <td style={{ padding: '1rem' }}>
