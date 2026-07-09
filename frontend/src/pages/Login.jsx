@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import authService from '../services/authService';
 import { motion } from 'framer-motion';
 import { User, Phone, Mail, Lock, Shield, ArrowRight, HeartPulse, Brain, AlertCircle } from 'lucide-react';
-import Particles, { initParticlesEngine } from "@tsparticles/react";
+import Particles, { ParticlesProvider } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 
 const FeatureCard = ({ icon: Icon, title, delay }) => (
@@ -24,7 +24,6 @@ const FeatureCard = ({ icon: Icon, title, delay }) => (
 
 const Login = () => {
   const navigate = useNavigate();
-  const [init, setInit] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -32,14 +31,6 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
 
   const particlesOptions = useMemo(() => ({
     background: { color: { value: "transparent" } },
@@ -95,11 +86,11 @@ const Login = () => {
           <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-600/20 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
 
-        {init && (
-          <div className="absolute inset-0 -z-20">
+        <div className="absolute inset-0 -z-20">
+          <ParticlesProvider init={loadSlim}>
             <Particles id="tsparticles" options={particlesOptions} className="w-full h-full" />
-          </div>
-        )}
+          </ParticlesProvider>
+        </div>
 
         {/* ECG Line Animation Overlay (CSS based) */}
         <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 opacity-20 pointer-events-none -z-10">
