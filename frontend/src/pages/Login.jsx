@@ -2,23 +2,24 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Lock, Shield, ArrowRight, HeartPulse, Brain, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Phone, Lock, Shield, ArrowRight, HeartPulse, Brain, AlertCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Particles, { ParticlesProvider } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import { FcGoogle } from 'react-icons/fc';
 
-const FeatureCard = ({ icon: Icon, title, delay }) => (
+const FeatureCard = ({ icon: Icon, title, subtitle, delay }) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ delay, duration: 0.5 }}
-    className="flex items-center gap-4 bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-colors"
+    className="flex items-center gap-5 bg-[#0f172a]/60 backdrop-blur-md border border-white/5 rounded-2xl p-4 hover:bg-white/5 transition-colors"
   >
-    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center text-cyan-400">
+    <div className="flex-shrink-0 p-3 rounded-2xl bg-cyan-500/10 text-cyan-400">
       <Icon size={24} />
     </div>
     <div>
-      <h3 className="text-white font-semibold">{title}</h3>
+      <h3 className="text-white font-bold text-[15px]">{title}</h3>
+      <p className="text-slate-400 text-[13px] mt-0.5">{subtitle}</p>
     </div>
   </motion.div>
 );
@@ -26,21 +27,17 @@ const FeatureCard = ({ icon: Icon, title, delay }) => (
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [viewMode, setViewMode] = useState('patient'); // 'patient' or 'staff'
-  const [formData, setFormData] = useState({
-    phone: '',
-    password: ''
-  });
+  const [viewMode, setViewMode] = useState('patient');
+  const [formData, setFormData] = useState({ phone: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const errorParam = params.get('error');
     if (errorParam) {
-      // Decode if necessary, though get() handles most decoding
       setError(errorParam);
-      // Automatically switch to staff view if it's a Google Auth error
       if (errorParam.includes('Administrator') || errorParam.includes('Google') || errorParam.includes('Access Denied')) {
         setViewMode('staff');
       }
@@ -50,12 +47,7 @@ const Login = () => {
   const particlesOptions = useMemo(() => ({
     background: { color: { value: "transparent" } },
     fpsLimit: 120,
-    interactivity: {
-      events: {
-        onHover: { enable: true, mode: "repulse" },
-      },
-      modes: { repulse: { distance: 100, duration: 0.4 } },
-    },
+    interactivity: { events: { onHover: { enable: true, mode: "repulse" } }, modes: { repulse: { distance: 100, duration: 0.4 } } },
     particles: {
       color: { value: "#38bdf8" },
       links: { color: "#38bdf8", distance: 150, enable: true, opacity: 0.2, width: 1 },
@@ -68,20 +60,14 @@ const Login = () => {
     detectRetina: true,
   }), []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      // Force Patient role context for manual login
       const data = await authService.login({ ...formData, role: 'Patient' });
-      
-      // Even if user provides phone, we trust backend to return the correct role
       if (data.user.role === 'Admin') navigate('/admin-dashboard');
       else if (data.user.role === 'Doctor') navigate('/doctor-dashboard');
       else navigate('/patient-dashboard');
@@ -98,179 +84,132 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex bg-[#030712] overflow-hidden text-slate-300 font-sans relative">
-      
+      {/* BACKGROUND EFFECTS */}
+      <div className="absolute inset-0 -z-20">
+        <ParticlesProvider init={loadSlim}>
+          <Particles id="tsparticles" options={particlesOptions} className="w-full h-full" />
+        </ParticlesProvider>
+      </div>
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-600/10 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
       {/* LEFT SIDE (60%) */}
-      <div className="hidden lg:flex lg:w-[60%] relative flex-col justify-center p-20 z-10">
-        
-        {/* Animated Blobs */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] animate-pulse"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-600/20 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }}></div>
-        </div>
-
-        <div className="absolute inset-0 -z-20">
-          <ParticlesProvider init={loadSlim}>
-            <Particles id="tsparticles" options={particlesOptions} className="w-full h-full" />
-          </ParticlesProvider>
-        </div>
-
-        {/* ECG Line Animation Overlay (CSS based) */}
-        <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 opacity-20 pointer-events-none -z-10">
-           <svg className="w-full h-full stroke-cyan-400" viewBox="0 0 1000 200" preserveAspectRatio="none">
-             <path 
-               d="M 0 100 L 200 100 L 220 50 L 240 150 L 260 80 L 280 120 L 300 100 L 500 100 L 520 50 L 540 150 L 560 80 L 580 120 L 600 100 L 1000 100" 
-               fill="none" 
-               strokeWidth="2" 
-               className="animate-[dash_3s_linear_infinite]"
-               strokeDasharray="1000"
-               strokeDashoffset="1000"
-             />
-           </svg>
-           <style>{`
-             @keyframes dash {
-               to { stroke-dashoffset: 0; }
-             }
-           `}</style>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-2xl"
-        >
+      <div className="hidden lg:flex lg:w-[60%] relative flex-col justify-center p-20 z-10 pl-[8%]">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-2xl">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white shadow-[0_0_20px_rgba(6,182,212,0.4)]">
-              <Shield size={28} />
+            <div className="w-10 h-10 rounded-[10px] bg-[#0ea5e9] flex items-center justify-center text-white">
+              <Shield size={22} fill="white" className="text-white" />
             </div>
-            <span className="text-xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 uppercase">
-              DKD Hospital
+            <span className="text-[17px] font-extrabold text-white tracking-[0.2em] uppercase">
+              DKD HOSPITAL
             </span>
           </div>
 
-          <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight mb-6 tracking-tight">
+          <h1 className="text-5xl lg:text-[54px] font-extrabold text-white leading-[1.2] mb-5 tracking-tight">
             AI-Powered Continuous <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+            <span className="text-[#06b6d4]">
               Patient Telemetry
             </span>
           </h1>
           
-          <p className="text-xl text-slate-400 mb-12 max-w-xl leading-relaxed">
+          <p className="text-[17px] text-slate-300 mb-10 max-w-xl leading-relaxed">
             Real-Time Patient Monitoring • AI Health Analytics • Emergency Alert System • Smart Hospital Dashboard
           </p>
 
           <div className="flex flex-col gap-4 max-w-md">
-            <FeatureCard icon={HeartPulse} title="Live ECG Monitoring" delay={0.2} />
-            <FeatureCard icon={Brain} title="AI Disease Prediction" delay={0.4} />
-            <FeatureCard icon={AlertCircle} title="Instant Emergency Alerts" delay={0.6} />
+            <FeatureCard icon={HeartPulse} title="Live ECG Monitoring" subtitle="Real-time heart activity tracking" delay={0.2} />
+            <FeatureCard icon={Brain} title="AI Disease Prediction" subtitle="Early detection with AI analytics" delay={0.4} />
+            <FeatureCard icon={AlertCircle} title="Instant Emergency Alerts" subtitle="Immediate notifications for critical events" delay={0.6} />
           </div>
         </motion.div>
       </div>
 
       {/* RIGHT SIDE (40%) - LOGIN CARD */}
-      <div className="w-full lg:w-[40%] flex items-center justify-center p-6 sm:p-12 z-20 relative overflow-hidden">
-        
+      <div className="w-full lg:w-[40%] flex items-center justify-center p-6 sm:p-12 z-20 relative">
         <AnimatePresence mode="wait">
-          
           {viewMode === 'patient' && (
             <motion.div 
               key="patient-view"
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="w-full max-w-[550px] bg-[#0f172a]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 sm:p-14 shadow-[0_0_80px_rgba(37,99,235,0.2)] relative overflow-hidden flex flex-col justify-between"
+              initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }}
+              className="w-full max-w-[480px] bg-[#0A101F]/90 backdrop-blur-3xl border border-[#0ea5e9]/40 rounded-3xl p-10 shadow-[0_0_50px_rgba(14,165,233,0.15)] relative"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-80"></div>
-
-              <div className="text-center mb-10">
-                <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight drop-shadow-md">Patient Portal</h2>
-                <p className="text-slate-400 text-lg">Sign in to securely view your health records</p>
+              <div className="text-center mb-8">
+                <h2 className="text-[34px] font-bold text-white mb-2 tracking-tight">Patient Portal</h2>
+                <p className="text-slate-300 text-[14.5px]">Sign in to securely view your health records</p>
               </div>
               
               {error && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-red-500/10 text-red-400 p-4 rounded-2xl mb-8 text-center border border-red-500/20 text-base font-medium shadow-inner"
-                >
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-4 rounded-xl mb-6 text-center border border-red-500/20 text-sm">
                   {error}
                 </motion.div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-7">
-                
-                <div className="space-y-2 relative group">
-                  <label className="text-sm font-semibold text-slate-300 ml-1 uppercase tracking-wider">Phone Number</label>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-white uppercase tracking-wider">Phone Number</label>
                   <div className="relative flex items-center">
-                    <Phone size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors duration-300" />
+                    <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
-                      type="tel" 
-                      name="phone" 
-                      required 
-                      placeholder="+1 (555) 000-0000"
-                      value={formData.phone} 
-                      onChange={handleChange} 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-5 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 transition-all duration-300 text-lg sm:text-xl font-medium"
-                      style={{ paddingLeft: '4rem' }}
+                      type="tel" name="phone" required placeholder="+1 (555) 000-0000"
+                      value={formData.phone} onChange={handleChange} 
+                      className="w-full bg-transparent border border-slate-700 rounded-xl py-3 pr-4 text-white placeholder-slate-500 focus:outline-none focus:border-[#0ea5e9] transition-colors text-[15px]"
+                      style={{ paddingLeft: '2.75rem' }}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2 relative group">
-                  <label className="text-sm font-semibold text-slate-300 ml-1 uppercase tracking-wider">Password</label>
+                <div className="space-y-2">
+                  <label className="text-[12px] font-bold text-white uppercase tracking-wider">Password</label>
                   <div className="relative flex items-center">
-                    <Lock size={22} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-400 transition-colors duration-300" />
+                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
-                      type="password" 
-                      name="password" 
-                      required 
-                      placeholder="••••••••"
-                      value={formData.password} 
-                      onChange={handleChange} 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pr-5 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 transition-all duration-300 text-lg sm:text-xl font-medium"
-                      style={{ paddingLeft: '4rem' }}
+                      type={showPassword ? 'text' : 'password'} name="password" required placeholder="Enter your password"
+                      value={formData.password} onChange={handleChange} 
+                      className="w-full bg-transparent border border-slate-700 rounded-xl py-3 pr-12 text-white placeholder-slate-500 focus:outline-none focus:border-[#0ea5e9] transition-colors text-[15px]"
+                      style={{ paddingLeft: '2.75rem' }}
                     />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-1 px-1">
+                <div className="flex items-center justify-between mt-1">
                   <label className="flex items-center gap-3 cursor-pointer group">
-                    <div className="w-6 h-6 rounded-md border border-white/20 bg-white/5 flex items-center justify-center group-hover:border-cyan-400 transition-colors shadow-inner">
+                    <div className="w-4 h-4 rounded-[4px] border border-slate-600 flex items-center justify-center bg-transparent group-hover:border-slate-400 transition-colors">
                       <input type="checkbox" className="opacity-0 absolute w-0 h-0" />
-                      <div className="w-3.5 h-3.5 bg-cyan-400 rounded-sm opacity-0 scale-50 group-focus-within:opacity-100 group-focus-within:scale-100 transition-all"></div>
+                      <div className="w-2 h-2 bg-cyan-400 rounded-[2px] opacity-0 group-focus-within:opacity-100 transition-all"></div>
                     </div>
-                    <span className="text-base text-slate-400 group-hover:text-slate-200 transition-colors">Remember me</span>
+                    <span className="text-[14px] text-white">Remember me</span>
                   </label>
-                  <a href="#" className="text-base text-cyan-400 hover:text-cyan-300 font-medium transition-colors">Forgot Password?</a>
+                  <a href="#" className="text-[14px] text-[#0ea5e9] hover:text-cyan-300 transition-colors">Forgot Password?</a>
                 </div>
 
                 <motion.button 
-                  type="submit" 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-5 mt-4 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold text-xl flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(6,182,212,0.3)] hover:shadow-[0_15px_40px_rgba(6,182,212,0.5)] transition-all duration-300 relative overflow-hidden group"
+                  type="submit" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                  className="w-full py-3 mt-3 rounded-xl bg-gradient-to-r from-blue-600 to-[#00c6ff] text-white font-bold text-[16px] flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
                   disabled={loading}
                 >
-                  <span className="relative z-10">{loading ? 'Authenticating...' : 'Sign In'}</span>
-                  {!loading && <ArrowRight size={24} className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" />}
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
+                  {loading ? 'Authenticating...' : 'Sign In'}
+                  {!loading && <ArrowRight size={20} />}
                 </motion.button>
               </form>
 
-              <div className="mt-10 text-center text-slate-400 text-lg">
+              <div className="mt-5 text-center text-slate-400 text-[14.5px]">
                 New OP Patient?{' '}
-                <Link to="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors font-semibold underline decoration-2 underline-offset-4">
+                <Link to="/register" className="text-[#0ea5e9] hover:text-cyan-300 transition-colors underline decoration-[#0ea5e9]/50 underline-offset-4">
                   Register here
                 </Link>
               </div>
 
-              <div className="text-center mt-8 pt-8 border-t border-white/10">
+              <div className="mt-8 pt-6 border-t border-slate-800 text-left">
                 <button 
                   onClick={() => { setError(''); setViewMode('staff'); }}
-                  className="text-slate-400 hover:text-white transition-colors text-base font-medium flex items-center justify-center gap-2 mx-auto"
+                  className="text-slate-400 hover:text-white transition-colors text-[14.5px] flex items-center gap-2"
                 >
-                  Admin / Doctor Login <ArrowRight size={18} />
+                  Admin / Doctor Login <ArrowRight size={16} />
                 </button>
               </div>
             </motion.div>
@@ -279,60 +218,47 @@ const Login = () => {
           {viewMode === 'staff' && (
             <motion.div 
               key="staff-view"
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="w-full max-w-[550px] bg-[#0f172a]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 sm:p-14 shadow-[0_0_80px_rgba(37,99,235,0.2)] relative overflow-hidden flex flex-col justify-between"
+              initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }}
+              className="w-full max-w-[480px] bg-[#0A101F]/90 backdrop-blur-3xl border border-[#0ea5e9]/40 rounded-3xl p-10 shadow-[0_0_50px_rgba(14,165,233,0.15)] relative"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80"></div>
-
               <div className="text-center mb-10">
-                <div className="w-20 h-20 mx-auto bg-gradient-to-tr from-blue-900 to-blue-600 rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_10px_30px_rgba(37,99,235,0.4)] border border-white/10">
-                  <Shield size={40} />
+                <div className="w-16 h-16 mx-auto bg-gradient-to-tr from-blue-900 to-[#0ea5e9] rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg border border-white/10">
+                  <Shield size={32} />
                 </div>
-                <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-4 tracking-tight drop-shadow-md">Staff Portal</h2>
-                <p className="text-slate-400 text-lg">Secure access for Doctors & Administrators</p>
+                <h2 className="text-[34px] font-bold text-white mb-2 tracking-tight">Staff Portal</h2>
+                <p className="text-slate-300 text-[14.5px]">Secure access for Doctors & Administrators</p>
               </div>
               
               {error && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="bg-red-500/10 text-red-400 p-4 rounded-2xl mb-10 text-center border border-red-500/20 text-base font-medium shadow-inner"
-                >
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-4 rounded-xl mb-8 text-center border border-red-500/20 text-sm">
                   {error}
                 </motion.div>
               )}
 
-              <div className="flex flex-col gap-6 mb-10">
+              <div className="flex flex-col gap-4 mb-8">
                 <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleGoogleLogin}
-                  className="w-full py-5 rounded-2xl bg-white text-slate-900 font-bold text-xl flex items-center justify-center gap-4 hover:bg-slate-100 transition-colors shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
+                  whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} onClick={handleGoogleLogin}
+                  className="w-full py-3.5 rounded-xl bg-white text-slate-900 font-bold text-[16px] flex items-center justify-center gap-3 hover:bg-slate-100 transition-colors shadow-lg"
                 >
-                  <FcGoogle size={30} />
+                  <FcGoogle size={24} />
                   Continue with Google
                 </motion.button>
               </div>
               
-              <div className="text-center text-sm text-slate-500 mb-10 max-w-[320px] mx-auto leading-relaxed">
+              <div className="text-center text-[13px] text-slate-400 mb-8 max-w-[280px] mx-auto leading-relaxed">
                 <p>Authentication restricted to authorized clinical staff and system administrators only.</p>
               </div>
 
-              <div className="text-center pt-8 border-t border-white/10">
+              <div className="mt-8 pt-6 border-t border-slate-800 text-left">
                 <button 
                   onClick={() => { setError(''); setViewMode('patient'); }}
-                  className="text-slate-400 hover:text-white transition-colors text-base font-medium flex items-center justify-center gap-2 mx-auto"
+                  className="text-slate-400 hover:text-white transition-colors text-[14.5px] flex items-center gap-2"
                 >
-                  <ArrowLeft size={18} />
-                  Back to Patient Login
+                  <ArrowLeft size={16} /> Back to Patient Login
                 </button>
               </div>
             </motion.div>
           )}
-
         </AnimatePresence>
       </div>
     </div>
@@ -340,3 +266,4 @@ const Login = () => {
 };
 
 export default Login;
+
