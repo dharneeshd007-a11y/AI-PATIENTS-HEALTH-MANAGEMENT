@@ -229,9 +229,7 @@ const AdminPatients = () => {
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Patient ID</th>
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>MRN</th>
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Name / Demographics</th>
-              <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Type</th>
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Assigned Doctor</th>
-              <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Location / Next Appt</th>
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)' }}>Status</th>
               <th style={{ padding: '1rem', fontWeight: 500, color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
             </tr>
@@ -245,16 +243,7 @@ const AdminPatients = () => {
                   <div style={{ fontWeight: 600 }}>{p.full_name || p.name}</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.age} yrs • {p.gender} • {p.phone}</div>
                 </td>
-                <td style={{ padding: '1rem' }}>
-                  <span className="badge badge-pulse" style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', display: 'inline-block' }}>🟥 ICU</span>
-                </td>
                 <td style={{ padding: '1rem', color: 'var(--accent-cyan)' }}>Dr. {p.doctor_name || 'Unassigned'}</td>
-                <td style={{ padding: '1rem' }}>
-                    <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                      <div><strong>Ward:</strong> {p.ward || '--'}</div>
-                      <div><strong>Room:</strong> {p.room_no || '--'} | <strong>Bed:</strong> {p.bed_no || '--'}</div>
-                    </div>
-                </td>
                 <td style={{ padding: '1rem' }}>
                   <span style={{ 
                     padding: '0.3rem 0.6rem', borderRadius: '12px', fontSize: '0.85rem', fontWeight: 500,
@@ -277,7 +266,7 @@ const AdminPatients = () => {
             ))}
             {filteredSearch.length === 0 && (
               <tr>
-                <td colSpan="8" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No patients found matching your criteria.</td>
+                <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No patients found matching your criteria.</td>
               </tr>
             )}
           </tbody>
