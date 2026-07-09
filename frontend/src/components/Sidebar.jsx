@@ -63,17 +63,13 @@ const Sidebar = () => {
             <NavLink to="/admin-patients" style={navLinkStyle}>
               <HeartPulse size={20} /> Patients
             </NavLink>
-            <NavLink to="/appointments" style={navLinkStyle}>
-              <Calendar size={20} /> Appointments
-            </NavLink>
+
           </>
         )}
 
         {userRole === 'Doctor' && (
           <>
-            <NavLink to="/appointments" style={navLinkStyle}>
-              <Calendar size={20} /> Appointments
-            </NavLink>
+
             <NavLink to="/doctor-patients" style={navLinkStyle}>
               <HeartPulse size={20} /> My Patients
             </NavLink>
@@ -97,9 +93,7 @@ const Sidebar = () => {
             
             {patientType === 'OP' ? (
               <>
-                <NavLink to="/appointments" style={navLinkStyle}>
-                  <Calendar size={20} /> Appointments
-                </NavLink>
+
                 <NavLink to="/medications" style={navLinkStyle}>
                   <Pill size={20} /> Medications
                 </NavLink>
