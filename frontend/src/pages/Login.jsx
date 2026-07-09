@@ -176,7 +176,7 @@ const Login = () => {
             <div className="space-y-1 relative group">
               <label className="text-sm font-medium text-slate-400 ml-1">Email / Phone</label>
               <div className="relative flex items-center">
-                <Mail size={18} className="absolute left-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                 <input 
                   type="email" 
                   name="email" 
@@ -184,7 +184,8 @@ const Login = () => {
                   placeholder="name@hospital.com"
                   value={formData.email} 
                   onChange={handleChange} 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
+                  style={{ paddingLeft: '3rem' }}
                 />
               </div>
             </div>
@@ -192,7 +193,7 @@ const Login = () => {
             <div className="space-y-1 relative group">
               <label className="text-sm font-medium text-slate-400 ml-1">Password</label>
               <div className="relative flex items-center">
-                <Lock size={18} className="absolute left-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                 <input 
                   type="password" 
                   name="password" 
@@ -200,7 +201,8 @@ const Login = () => {
                   placeholder="••••••••"
                   value={formData.password} 
                   onChange={handleChange} 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
+                  style={{ paddingLeft: '3rem' }}
                 />
               </div>
             </div>
@@ -208,12 +210,13 @@ const Login = () => {
             <div className="space-y-1 relative group">
               <label className="text-sm font-medium text-slate-400 ml-1">Login As</label>
               <div className="relative flex items-center">
-                <User size={18} className="absolute left-4 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors pointer-events-none" />
                 <select 
                   name="role" 
                   value={formData.role} 
                   onChange={handleChange}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300 appearance-none cursor-pointer"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-10 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300 appearance-none cursor-pointer"
+                  style={{ paddingLeft: '3rem' }}
                 >
                   <option value="Doctor" className="bg-slate-900">Doctor</option>
                   <option value="Patient" className="bg-slate-900">Patient</option>
