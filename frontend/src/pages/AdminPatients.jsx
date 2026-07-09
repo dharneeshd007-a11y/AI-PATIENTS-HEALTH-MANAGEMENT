@@ -18,8 +18,7 @@ const AdminPatients = () => {
   const fetchData = async () => {
     try {
       // Build query string
-      let url = '/api/admin/patients?';
-      if (filterStatus !== 'All') url += `status=${filterStatus}`;
+      let url = '/api/patients';
 
       const [patientsRes, usersRes] = await Promise.all([
         axios.get(url),
@@ -112,8 +111,12 @@ const AdminPatients = () => {
 
   const filteredSearch = patients.filter(p => {
     const name = p.name || p.full_name || '';
-    return name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-           (p.mrn && p.mrn.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.mrn && p.mrn.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesStatus = filterStatus === 'All' || p.status === filterStatus;
+    
+    return matchesSearch && matchesStatus;
   });
 
   return (
