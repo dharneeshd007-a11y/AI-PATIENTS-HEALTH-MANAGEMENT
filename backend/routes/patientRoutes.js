@@ -100,6 +100,27 @@ router.post('/', async (req, res) => {
       );
     }
     
+    // Auto-create User account for the patient so they don't have to register
+    if (phone) {
+      try {
+        const bcrypt = require('bcryptjs');
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(phone, salt); // Password is their phone number
+        const fakeEmail = `${phone}@patient.com`;
+        
+        // check if phone already exists in users table
+        const [existing] = await db.query('SELECT id FROM users WHERE phone = ?', [phone]);
+        if (existing.length === 0) {
+          await db.query(
+            'INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)',
+            [name, fakeEmail, phone, hashedPassword, 'Patient']
+          );
+        }
+      } catch (err) {
+        console.error("Auto-user creation failed:", err);
+      }
+    }
+    
     res.status(201).json({ id: result.insertId, name, age, gender, room, status, mrn });
   } catch (err) {
     console.error(err);
