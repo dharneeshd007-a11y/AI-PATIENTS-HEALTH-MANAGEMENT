@@ -99,7 +99,7 @@ const Login = () => {
       </div>
 
       {/* LEFT SECTION (60%) */}
-      <div className="hidden lg:flex lg:w-[60%] relative flex-col justify-center p-20 z-10 pl-[8%]">
+      <div className="hidden lg:flex lg:w-[60%] relative flex-col justify-center px-12 lg:px-20 xl:px-28 z-10">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl">
           
           <div className="flex items-center gap-4 mb-10">
