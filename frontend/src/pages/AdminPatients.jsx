@@ -50,7 +50,7 @@ const AdminPatients = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this patient? \n\nWARNING: This will permanently delete the patient, along with all their appointments, medications, reports, and monitoring records.')) {
       try {
-        await axios.delete(`/api/admin/patients/${id}`);
+        await axios.delete(`/api/patients/${id}`);
         fetchData();
         // Toast notification could go here
       } catch (error) {
@@ -59,10 +59,19 @@ const AdminPatients = () => {
     }
   };
 
+  const getMappedData = () => {
+    const doc = doctors.find(d => d.id == formData.assigned_doctor_id);
+    return {
+      ...formData,
+      room: formData.ward ? `${formData.ward}-${formData.room_no}-${formData.bed_no}` : (formData.room_no || ''),
+      doctor_name: doc ? doc.full_name : ''
+    };
+  };
+
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/admin/patients', formData);
+      await axios.post('/api/patients', getMappedData());
       setShowForm(false);
       resetForm();
       fetchData();
@@ -74,7 +83,7 @@ const AdminPatients = () => {
   const handleEditSubmit = async (e, id) => {
     e.preventDefault();
     try {
-      await axios.put(`/api/admin/patients/${id}`, formData);
+      await axios.put(`/api/patients/${id}`, getMappedData());
       setEditPatientId(null);
       resetForm();
       fetchData();
