@@ -49,7 +49,7 @@ router.get('/', async (req, res) => {
         res.status(200).json(patients);
     } catch (error) {
         console.error("Admin GET patients error:", error);
-        res.status(500).json({ error: 'Failed to fetch patients' });
+        res.status(500).json({ error: 'Failed to fetch patients', details: error.message, stack: error.stack });
     }
 });
 
