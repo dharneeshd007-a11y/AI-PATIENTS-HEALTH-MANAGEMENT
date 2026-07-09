@@ -20,7 +20,8 @@ const AdminDashboard = () => {
           axios.get('/api/users/admin/metrics'),
           axios.get('/api/alerts')
         ]);
-        setUsers(usersRes.data);
+        // Filter out Patient roles from the Registered Users list
+        setUsers(usersRes.data.filter(u => u.role !== 'Patient'));
         setMetrics(metricsRes.data);
         setAlerts(alertsRes.data.slice(0, 5)); // Show latest 5 alerts
       } catch (error) {
