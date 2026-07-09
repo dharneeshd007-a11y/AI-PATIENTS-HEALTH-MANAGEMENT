@@ -179,13 +179,13 @@ const Login = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="w-full max-w-md bg-[#111827]/65 backdrop-blur-xl border border-white/10 rounded-[30px] p-8 sm:p-10 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative"
+              className="w-full max-w-[500px] bg-[#111827]/65 backdrop-blur-xl border border-white/10 rounded-[30px] p-10 sm:p-12 shadow-[0_0_50px_rgba(37,99,235,0.15)] relative"
             >
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
 
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Patient Portal</h2>
-                <p className="text-slate-400">Sign in to view your health records</p>
+              <div className="text-center mb-10">
+                <h2 className="text-4xl font-bold text-white mb-3 tracking-tight">Patient Portal</h2>
+                <p className="text-slate-400 text-base">Sign in to view your health records</p>
               </div>
               
               {error && (
@@ -198,12 +198,12 @@ const Login = () => {
                 </motion.div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 
-                <div className="space-y-1 relative group">
+                <div className="space-y-1.5 relative group">
                   <label className="text-sm font-medium text-slate-400 ml-1">Phone Number</label>
                   <div className="relative flex items-center">
-                    <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                    <Phone size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                     <input 
                       type="tel" 
                       name="phone" 
@@ -211,16 +211,16 @@ const Login = () => {
                       placeholder="+1 (555) 000-0000"
                       value={formData.phone} 
                       onChange={handleChange} 
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
-                      style={{ paddingLeft: '3rem' }}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300 text-lg"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-1 relative group">
+                <div className="space-y-1.5 relative group">
                   <label className="text-sm font-medium text-slate-400 ml-1">Password</label>
                   <div className="relative flex items-center">
-                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                    <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
                     <input 
                       type="password" 
                       name="password" 
@@ -228,8 +228,8 @@ const Login = () => {
                       placeholder="••••••••"
                       value={formData.password} 
                       onChange={handleChange} 
-                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300"
-                      style={{ paddingLeft: '3rem' }}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all duration-300 text-lg"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
                   </div>
                 </div>
@@ -249,16 +249,23 @@ const Login = () => {
                   type="submit" 
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full py-3.5 mt-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-shadow relative overflow-hidden group"
+                  className="w-full py-4 mt-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold text-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)] transition-shadow relative overflow-hidden group"
                   disabled={loading}
                 >
                   <span className="relative z-10">{loading ? 'Authenticating...' : 'Sign In'}</span>
-                  {!loading && <ArrowRight size={18} className="relative z-10 group-hover:translate-x-1 transition-transform" />}
+                  {!loading && <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />}
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
                 </motion.button>
               </form>
 
-              <div className="text-center mt-8 pt-6 border-t border-white/10 text-sm">
+              <div className="mt-8 text-center text-slate-400 text-[15px]">
+                New OP Patient?{' '}
+                <Link to="/register" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+                  Register here
+                </Link>
+              </div>
+
+              <div className="text-center mt-6 pt-6 border-t border-white/10 text-sm">
                 <button 
                   onClick={() => { setError(''); setViewMode('staff'); }}
                   className="text-slate-400 hover:text-white transition-colors"
