@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 // Database Configuration
+// Run migrations on startup to ensure DB schema is up to date
+require('./migrate');
+
 const db = require('./config/db');
 
 // Load environment variables
