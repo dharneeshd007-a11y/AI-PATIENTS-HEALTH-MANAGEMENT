@@ -42,8 +42,11 @@ const DoctorDashboard = () => {
       }));
     });
 
+    const interval = setInterval(fetchData, 10000); // Auto-reload every 10 seconds
+
     return () => {
       socketService.off('new_alert');
+      clearInterval(interval);
     };
   }, []);
 

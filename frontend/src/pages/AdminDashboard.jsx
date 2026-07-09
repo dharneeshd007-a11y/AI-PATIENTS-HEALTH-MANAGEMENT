@@ -28,7 +28,10 @@ const AdminDashboard = () => {
         console.error("Error fetching admin data:", error);
       }
     };
+    
     fetchData();
+    const interval = setInterval(fetchData, 10000); // Auto-reload every 10 seconds
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {

@@ -33,10 +33,8 @@ const AdminPatients = () => {
 
   useEffect(() => {
     fetchData();
-    const socketService = require('../services/socketService').default;
-    socketService.connect();
-    socketService.on('new_alert', fetchData);
-    return () => socketService.off('new_alert', fetchData);
+    const interval = setInterval(fetchData, 10000); // Auto-reload every 10 seconds
+    return () => clearInterval(interval);
   }, [filterType, filterStatus]);
 
   const [editPatientId, setEditPatientId] = useState(null);
