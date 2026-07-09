@@ -85,9 +85,6 @@ app.get('/api/migrate', async (req, res) => {
     res.status(500).json({ error: error.message, stack: error.stack });
   }
 });
-    res.status(500).json({ error: error.message, stack: error.stack });
-  }
-});
 
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
