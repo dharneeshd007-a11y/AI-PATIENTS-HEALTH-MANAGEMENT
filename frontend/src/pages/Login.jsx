@@ -138,84 +138,84 @@ const Login = () => {
             <motion.div 
               key="patient-view"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5, ease: "easeOut" }}
-              className="w-full max-w-[700px] bg-[#0A1225]/80 backdrop-blur-3xl border border-[rgba(0,212,255,0.25)] rounded-[28px] p-12 sm:p-16 shadow-[0_0_60px_rgba(0,212,255,0.1)] relative"
+              className="w-full max-w-[700px] bg-[#0A1225]/80 backdrop-blur-3xl border border-[rgba(0,212,255,0.25)] rounded-[28px] p-[48px] shadow-[0_0_60px_rgba(0,212,255,0.1)] relative flex flex-col justify-center"
             >
-              <div className="text-center mb-12">
-                <h2 className="text-[40px] font-extrabold text-white mb-3 tracking-tight">Patient Portal</h2>
-                <p className="text-[#AAB6D6] text-[17px] font-medium">Sign in to securely view your health records</p>
+              <div className="text-center">
+                <h2 className="text-[56px] font-bold text-white leading-tight tracking-tight">Patient Portal</h2>
+                <p className="text-[#AAB6D6] text-[22px] mt-2">Sign in to securely view your health records</p>
               </div>
               
               {error && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-5 rounded-2xl mb-8 text-center border border-red-500/20 text-[15px] font-medium">
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-5 rounded-2xl mt-6 text-center border border-red-500/20 text-[18px] font-medium">
                   {error}
                 </motion.div>
               )}
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-7">
-                <div className="space-y-3">
-                  <label className="text-[14px] font-bold text-[#AAB6D6] uppercase tracking-[0.1em]">Phone Number</label>
+              <form onSubmit={handleSubmit} className="flex flex-col mt-[28px]">
+                <div className="flex flex-col">
+                  <label className="text-[16px] font-semibold text-[#AAB6D6] uppercase tracking-[1px] mb-3">Phone Number</label>
                   <div className="relative flex items-center">
-                    <Phone size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-[#4FC3FF]" />
+                    <Phone size={24} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#4FC3FF]" />
                     <input 
                       type="tel" name="phone" required placeholder="+1 (555) 000-0000"
                       value={formData.phone} onChange={handleChange} 
-                      className="w-full h-[60px] bg-[#030817]/50 border border-[rgba(0,212,255,0.2)] rounded-[16px] pr-6 text-white placeholder-[#AAB6D6]/50 focus:outline-none focus:border-[#00D4FF] focus:shadow-[0_0_20px_rgba(0,212,255,0.2)] transition-all text-[17px] tracking-wide"
-                      style={{ paddingLeft: '4rem' }}
+                      className="w-full h-[64px] bg-[#030817]/50 border border-[rgba(0,212,255,0.2)] rounded-[16px] pr-5 text-white placeholder:text-[#AAB6D6]/50 placeholder:text-[18px] focus:outline-none focus:border-[#00D4FF] focus:shadow-[0_0_20px_rgba(0,212,255,0.2)] transition-all text-[20px]"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-[14px] font-bold text-[#AAB6D6] uppercase tracking-[0.1em]">Password</label>
+                <div className="flex flex-col mt-[20px]">
+                  <label className="text-[16px] font-semibold text-[#AAB6D6] uppercase tracking-[1px] mb-3">Password</label>
                   <div className="relative flex items-center">
-                    <Lock size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-[#4FC3FF]" />
+                    <Lock size={24} className="absolute left-5 top-1/2 -translate-y-1/2 text-[#4FC3FF]" />
                     <input 
                       type={showPassword ? 'text' : 'password'} name="password" required placeholder="Enter your password"
                       value={formData.password} onChange={handleChange} 
-                      className="w-full h-[60px] bg-[#030817]/50 border border-[rgba(0,212,255,0.2)] rounded-[16px] pr-16 text-white placeholder-[#AAB6D6]/50 focus:outline-none focus:border-[#00D4FF] focus:shadow-[0_0_20px_rgba(0,212,255,0.2)] transition-all text-[17px]"
-                      style={{ paddingLeft: '4rem' }}
+                      className="w-full h-[64px] bg-[#030817]/50 border border-[rgba(0,212,255,0.2)] rounded-[16px] pr-[3.5rem] text-white placeholder:text-[#AAB6D6]/50 placeholder:text-[18px] focus:outline-none focus:border-[#00D4FF] focus:shadow-[0_0_20px_rgba(0,212,255,0.2)] transition-all text-[20px]"
+                      style={{ paddingLeft: '3.5rem' }}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-6 top-1/2 -translate-y-1/2 text-[#AAB6D6] hover:text-[#00D4FF] transition-colors">
-                      {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-[#AAB6D6] hover:text-[#00D4FF] transition-colors flex items-center justify-center">
+                      {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
                     </button>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-2 px-1">
-                  <label className="flex items-center gap-3.5 cursor-pointer group">
-                    <div className="w-[22px] h-[22px] rounded-[6px] border-[1.5px] border-[#AAB6D6]/50 flex items-center justify-center bg-transparent group-hover:border-[#00D4FF] transition-colors">
+                <div className="flex items-center justify-between mt-[24px]">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div className="w-[24px] h-[24px] rounded-[6px] border-[1.5px] border-[#AAB6D6]/50 flex items-center justify-center bg-transparent group-hover:border-[#00D4FF] transition-colors">
                       <input type="checkbox" className="opacity-0 absolute w-0 h-0" />
-                      <div className="w-3 h-3 bg-[#00D4FF] rounded-[3px] opacity-0 group-focus-within:opacity-100 transition-all"></div>
+                      <div className="w-3.5 h-3.5 bg-[#00D4FF] rounded-[3px] opacity-0 group-focus-within:opacity-100 transition-all"></div>
                     </div>
-                    <span className="text-[16px] text-[#AAB6D6] font-medium group-hover:text-white transition-colors">Remember me</span>
+                    <span className="text-[18px] text-[#AAB6D6] group-hover:text-white transition-colors">Remember me</span>
                   </label>
-                  <a href="#" className="text-[16px] font-semibold text-[#00D4FF] hover:text-[#4FC3FF] transition-colors tracking-wide">Forgot Password?</a>
+                  <a href="#" className="text-[18px] text-[#00D4FF] hover:text-[#4FC3FF] transition-colors">Forgot Password?</a>
                 </div>
 
                 <motion.button 
                   type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  className="w-full h-[60px] mt-4 rounded-[16px] bg-gradient-to-r from-[#009DFF] to-[#00D4FF] text-white font-bold text-[19px] flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(0,212,255,0.3)] hover:shadow-[0_15px_40px_rgba(0,212,255,0.5)] transition-all relative overflow-hidden group"
+                  className="w-full h-[64px] mt-[32px] rounded-[18px] bg-gradient-to-r from-[#009DFF] to-[#00D4FF] text-white font-bold text-[24px] flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(0,212,255,0.3)] hover:shadow-[0_15px_40px_rgba(0,212,255,0.6)] transition-all relative overflow-hidden group"
                   disabled={loading}
                 >
-                  <span className="relative z-10 tracking-wide">{loading ? 'Authenticating...' : 'Sign In'}</span>
-                  {!loading && <ArrowRight size={24} className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" />}
+                  <span className="relative z-10">{loading ? 'Authenticating...' : 'Sign In'}</span>
+                  {!loading && <ArrowRight size={28} className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" />}
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out z-0"></div>
                 </motion.button>
               </form>
 
-              <div className="mt-8 text-center text-[#AAB6D6] text-[16.5px] font-medium">
+              <div className="mt-[24px] text-center text-[#AAB6D6] text-[18px]">
                 New OP Patient?{' '}
                 <Link to="/register" className="text-[#00D4FF] hover:text-[#4FC3FF] transition-colors font-bold underline decoration-[2px] decoration-[#00D4FF]/40 underline-offset-[6px]">
                   Register here
                 </Link>
               </div>
 
-              <div className="mt-12 pt-8 border-t border-[rgba(0,212,255,0.15)] flex justify-start">
+              <div className="mt-[20px] pt-[20px] border-t border-[rgba(0,212,255,0.15)] flex justify-start">
                 <button 
                   onClick={() => { setError(''); setViewMode('staff'); }}
-                  className="text-[#AAB6D6] hover:text-white transition-colors text-[16px] font-semibold flex items-center gap-2 group"
+                  className="text-[#AAB6D6] hover:text-white transition-colors text-[18px] flex items-center gap-2 group"
                 >
-                  Admin / Doctor Login <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  Admin / Doctor Login <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
             </motion.div>
@@ -225,42 +225,42 @@ const Login = () => {
             <motion.div 
               key="staff-view"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5, ease: "easeOut" }}
-              className="w-full max-w-[700px] bg-[#0A1225]/80 backdrop-blur-3xl border border-[rgba(0,212,255,0.25)] rounded-[28px] p-12 sm:p-16 shadow-[0_0_60px_rgba(0,212,255,0.1)] relative"
+              className="w-full max-w-[700px] bg-[#0A1225]/80 backdrop-blur-3xl border border-[rgba(0,212,255,0.25)] rounded-[28px] p-[48px] shadow-[0_0_60px_rgba(0,212,255,0.1)] relative flex flex-col justify-center"
             >
-              <div className="text-center mb-14">
-                <div className="w-[80px] h-[80px] mx-auto bg-gradient-to-br from-[#009DFF] to-[#00D4FF] rounded-[24px] flex items-center justify-center text-white mb-8 shadow-[0_10px_30px_rgba(0,212,255,0.3)] border border-white/20">
+              <div className="text-center">
+                <div className="w-[80px] h-[80px] mx-auto bg-gradient-to-br from-[#009DFF] to-[#00D4FF] rounded-[24px] flex items-center justify-center text-white mb-6 shadow-[0_10px_30px_rgba(0,212,255,0.3)] border border-white/20">
                   <Shield size={44} />
                 </div>
-                <h2 className="text-[40px] font-extrabold text-white mb-3 tracking-tight">Staff Portal</h2>
-                <p className="text-[#AAB6D6] text-[17px] font-medium">Secure enterprise access for Doctors & Administrators</p>
+                <h2 className="text-[56px] font-bold text-white leading-tight tracking-tight">Staff Portal</h2>
+                <p className="text-[#AAB6D6] text-[22px] mt-2">Secure enterprise access for Doctors & Administrators</p>
               </div>
               
               {error && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-5 rounded-2xl mb-10 text-center border border-red-500/20 text-[15px] font-medium">
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-red-500/10 text-red-400 p-5 rounded-2xl mt-6 text-center border border-red-500/20 text-[18px] font-medium">
                   {error}
                 </motion.div>
               )}
 
-              <div className="flex flex-col gap-6 mb-12">
+              <div className="flex flex-col mt-[48px]">
                 <motion.button 
                   whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleGoogleLogin}
-                  className="w-full h-[64px] rounded-[16px] bg-white text-[#030817] font-bold text-[19px] flex items-center justify-center gap-4 hover:bg-slate-50 transition-colors shadow-[0_10px_30px_rgba(255,255,255,0.15)] tracking-wide"
+                  className="w-full h-[64px] rounded-[18px] bg-white text-[#030817] font-bold text-[24px] flex items-center justify-center gap-4 hover:bg-slate-50 transition-colors shadow-[0_10px_30px_rgba(255,255,255,0.15)]"
                 >
                   <FcGoogle size={32} />
                   Continue with Google
                 </motion.button>
               </div>
               
-              <div className="text-center text-[15px] text-[#AAB6D6]/80 mb-12 max-w-[400px] mx-auto leading-relaxed font-medium">
+              <div className="text-center text-[18px] text-[#AAB6D6]/80 mt-[32px] max-w-[400px] mx-auto leading-relaxed">
                 <p>Authentication restricted to authorized clinical staff and system administrators only.</p>
               </div>
 
-              <div className="mt-10 pt-8 border-t border-[rgba(0,212,255,0.15)] flex justify-start">
+              <div className="mt-[48px] pt-[20px] border-t border-[rgba(0,212,255,0.15)] flex justify-start">
                 <button 
                   onClick={() => { setError(''); setViewMode('patient'); }}
-                  className="text-[#AAB6D6] hover:text-white transition-colors text-[16px] font-semibold flex items-center gap-2 group"
+                  className="text-[#AAB6D6] hover:text-white transition-colors text-[18px] flex items-center gap-2 group"
                 >
-                  <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Back to Patient Login
+                  <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> Back to Patient Login
                 </button>
               </div>
             </motion.div>
