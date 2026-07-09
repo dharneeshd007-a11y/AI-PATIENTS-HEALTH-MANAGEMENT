@@ -20,6 +20,10 @@ const DoctorPatients = () => {
       }
     };
     fetchPatients();
+    
+    // Auto-reload every 10 seconds to catch admin changes
+    const interval = setInterval(fetchPatients, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleRequestAdmission = async (patientId) => {
