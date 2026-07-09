@@ -14,7 +14,11 @@ passport.use(new GoogleStrategy({
       const [existingUsers] = await db.query('SELECT * FROM users WHERE google_id = ?', [profile.id]);
       
       if (existingUsers.length > 0) {
-        return done(null, existingUsers[0]);
+        const user = existingUsers[0];
+        if (user.role === 'Patient') {
+          return done(new Error('Access Denied. Patients cannot use Google Sign-In.'), null);
+        }
+        return done(null, user);
       }
 
       // Check if user exists by email
@@ -23,29 +27,17 @@ passport.use(new GoogleStrategy({
 
       if (usersByEmail.length > 0) {
         const user = usersByEmail[0];
+        if (user.role === 'Patient') {
+          return done(new Error('Access Denied. Patients cannot use Google Sign-In.'), null);
+        }
         // If email exists but no google_id, update it
         await db.query('UPDATE users SET google_id = ? WHERE id = ?', [profile.id, user.id]);
         user.google_id = profile.id;
         return done(null, user);
       }
 
-      // Create new OP Patient automatically
-      const full_name = profile.displayName;
-      // Temporary password for Google auth users, though they won't use it
-      const bcrypt = require('bcryptjs');
-      const randomPassword = Math.random().toString(36).slice(-8);
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(randomPassword, salt);
-      // Temp phone number since it's required in schema
-      const tempPhone = 'G-' + Math.floor(Math.random() * 10000000);
-
-      const [result] = await db.query(
-        'INSERT INTO users (full_name, email, phone, password, role, google_id) VALUES (?, ?, ?, ?, ?, ?)',
-        [full_name, email, tempPhone, hashedPassword, 'Patient', profile.id]
-      );
-
-      const [newUsers] = await db.query('SELECT * FROM users WHERE id = ?', [result.insertId]);
-      return done(null, newUsers[0]);
+      // If user does not exist in the database at all
+      return done(new Error('Access Denied. Contact the Administrator.'), null);
     } catch (err) {
       console.error('Google Strategy Error:', err);
       return done(err, null);

@@ -16,9 +16,19 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // GET /api/auth/google/callback
 // Handles the callback from Google
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login?error=true' }),
-  authController.googleCallback
-);
+router.get('/google/callback', (req, res, next) => {
+  passport.authenticate('google', (err, user, info) => {
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    if (err) {
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(err.message)}`);
+    }
+    if (!user) {
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
+    }
+    // No sessions, just set user on req and pass to controller
+    req.user = user;
+    return authController.googleCallback(req, res);
+  })(req, res, next);
+});
 
 module.exports = router;
