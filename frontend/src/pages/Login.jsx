@@ -11,8 +11,10 @@ const Login = () => {
     password: '',
     role: 'Doctor'
   });
+  const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,21 +23,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMsg('');
     setLoading(true);
 
     try {
-      const data = await authService.login(formData);
-      
-      // Redirect based on role
-      if (data.user.role === 'Admin') {
-        navigate('/admin-dashboard');
-      } else if (data.user.role === 'Doctor') {
-        navigate('/doctor-dashboard');
+      if (isLogin) {
+        const data = await authService.login(formData);
+        if (data.user.role === 'Admin') {
+          navigate('/admin-dashboard');
+        } else if (data.user.role === 'Doctor') {
+          navigate('/doctor-dashboard');
+        } else {
+          navigate('/patient-dashboard');
+        }
       } else {
-        navigate('/patient-dashboard');
+        await authService.register(formData);
+        setSuccessMsg('Registration successful! Please login.');
+        setIsLogin(true);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please check credentials.');
+      setError(err.response?.data?.message || 'Authentication failed. Please check credentials.');
     } finally {
       setLoading(false);
     }
@@ -44,11 +51,19 @@ const Login = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '2rem' }}>
       <div className="glass-card" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2rem' }}>Welcome Back</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2rem' }}>
+          {isLogin ? 'Welcome Back' : 'Create Account'}
+        </h2>
         
         {error && (
           <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-red)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', textAlign: 'center' }}>
             {error}
+          </div>
+        )}
+
+        {successMsg && (
+          <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-green)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', textAlign: 'center' }}>
+            {successMsg}
           </div>
         )}
 
@@ -118,9 +133,18 @@ const Login = () => {
           </div>
 
           <button type="submit" className="btn btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }} disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? (isLogin ? 'Logging in...' : 'Registering...') : (isLogin ? 'Login' : 'Register')}
           </button>
         </form>
+
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <button 
+            onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); }} 
+            style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+          </button>
+        </div>
 
       </div>
     </div>
