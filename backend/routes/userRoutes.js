@@ -13,6 +13,17 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get pending approved doctors
+router.get('/admin/approved-doctors', async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT * FROM approved_doctors WHERE phone NOT IN (SELECT phone FROM users WHERE role='Doctor') ORDER BY created_at DESC");
+    res.json(rows);
+  } catch (err) {
+    console.warn(err.message);
+    res.json([]); // Table might not exist yet
+  }
+});
+
 // Get admin metrics
 router.get('/admin/metrics', async (req, res) => {
   try {

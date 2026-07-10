@@ -9,9 +9,10 @@ const Login = () => {
     full_name: '',
     phone: '',
     password: '',
-    role: 'Doctor'
+    role: 'Patient'
   });
   const [isLogin, setIsLogin] = useState(true);
+  const [portalType, setPortalType] = useState('patient'); // 'patient' or 'staff'
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -51,8 +52,25 @@ const Login = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '2rem' }}>
       <div className="glass-card" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '2rem' }}>
-          {isLogin ? 'Welcome Back' : 'Create Account'}
+        
+        {/* Portal Tabs */}
+        <div style={{ display: 'flex', marginBottom: '2rem', borderBottom: '1px solid var(--glass-border)' }}>
+          <button 
+            onClick={() => { setPortalType('patient'); setFormData({...formData, role: 'Patient'}); setError(''); setSuccessMsg(''); }}
+            style={{ flex: 1, padding: '1rem', background: 'none', border: 'none', borderBottom: portalType === 'patient' ? '2px solid var(--accent-cyan)' : 'none', color: portalType === 'patient' ? 'var(--accent-cyan)' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: portalType === 'patient' ? 'bold' : 'normal' }}
+          >
+            Patient Portal
+          </button>
+          <button 
+            onClick={() => { setPortalType('staff'); setFormData({...formData, role: 'Doctor'}); setError(''); setSuccessMsg(''); }}
+            style={{ flex: 1, padding: '1rem', background: 'none', border: 'none', borderBottom: portalType === 'staff' ? '2px solid var(--accent-blue)' : 'none', color: portalType === 'staff' ? 'var(--accent-blue)' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: portalType === 'staff' ? 'bold' : 'normal' }}
+          >
+            Staff Portal
+          </button>
+        </div>
+
+        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.8rem' }}>
+          {isLogin ? (portalType === 'patient' ? 'Patient Login' : 'Staff Login') : (portalType === 'patient' ? 'Patient Registration' : 'Doctor Registration')}
         </h2>
         
         {error && (
@@ -130,10 +148,13 @@ const Login = () => {
                 value={formData.role} 
                 onChange={handleChange}
                 style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+                disabled={portalType === 'staff' || portalType === 'patient'} // Disable since it's locked by tab
               >
-                <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
-                <option value="Patient" style={{ color: 'black' }}>Patient</option>
-                <option value="Admin" style={{ color: 'black' }}>Admin</option>
+                {portalType === 'staff' ? (
+                  <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
+                ) : (
+                  <option value="Patient" style={{ color: 'black' }}>Patient</option>
+                )}
               </select>
             </div>
           )}

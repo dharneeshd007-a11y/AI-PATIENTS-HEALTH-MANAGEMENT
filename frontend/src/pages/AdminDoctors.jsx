@@ -5,11 +5,15 @@ import authService from '../services/authService';
 
 const AdminDoctors = () => {
   const [doctors, setDoctors] = useState([]);
+  const [pendingDoctors, setPendingDoctors] = useState([]);
 
   const fetchDoctors = async () => {
     try {
       const response = await axios.get('/api/users');
       setDoctors(response.data.filter(u => u.role === 'Doctor'));
+      
+      const pendingResponse = await axios.get('/api/users/admin/approved-doctors');
+      setPendingDoctors(pendingResponse.data);
     } catch (error) {
       console.error("Error fetching doctors:", error);
     }
@@ -146,9 +150,29 @@ const AdminDoctors = () => {
                 </td>
               </tr>
             ))}
-            {doctors.length === 0 && (
+            {pendingDoctors.map(d => (
+              <tr key={'pending-'+d.id} style={{ borderBottom: '1px solid var(--glass-border)', backgroundColor: 'rgba(245, 158, 11, 0.05)' }}>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)', fontWeight: 'bold' }}>{d.badge_id || `-`}</td>
+                <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>{d.full_name}</td>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{d.email}</td>
+                <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{d.phone}</td>
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  <span style={{ 
+                    padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem',
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    color: 'var(--accent-orange)'
+                  }}>
+                    Pending Registration
+                  </span>
+                </td>
+                <td style={{ padding: '1rem 1.5rem' }}>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Waiting for user</span>
+                </td>
+              </tr>
+            ))}
+            {doctors.length === 0 && pendingDoctors.length === 0 && (
               <tr>
-                <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No doctors found.</td>
+                <td colSpan="6" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No doctors found.</td>
               </tr>
             )}
           </tbody>
