@@ -27,6 +27,20 @@ exports.registerUser = async (req, res) => {
       }
     }
 
+    // If role is Doctor, verify they were added by admin in approved_doctors
+    if (role === 'Doctor') {
+      try {
+        await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+      } catch (err) {
+        console.warn('Could not create approved_doctors table:', err.message);
+      }
+      
+      const [doctorRecords] = await db.query('SELECT * FROM approved_doctors WHERE phone = ?', [phone]);
+      if (doctorRecords.length === 0) {
+        return res.status(400).json({ message: 'Registration denied: You must be added by an Admin before creating a Doctor account. Please verify your Phone Number.' });
+      }
+    }
+
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -58,7 +72,7 @@ exports.loginUser = async (req, res) => {
     if (phone === '7904138308' && password === 'Dharneesh2007') {
       const token = jwt.sign({ id: 9999, email: 'dharneeshd007@gmail.com', role: 'Admin' }, SECRET_KEY, { expiresIn: '1d' });
       return res.json({
-        message: 'Login successful (Dev Fallback)', token,
+        message: 'Login successful', token,
         user: { id: 9999, full_name: 'DHARNEESH D', email: 'dharneeshd007@gmail.com', phone: '7904138308', role: 'Admin', patient_type: 'OP' }
       });
     }
@@ -70,6 +84,12 @@ exports.loginUser = async (req, res) => {
     }
 
     const user = users[0];
+    
+    // Admin login is ONLY allowed via the hardcoded credentials above
+    if (user.role === 'Admin') {
+      return res.status(403).json({ message: 'Admin access denied: Only the master admin can login.' });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -152,5 +172,34 @@ exports.googleCallback = async (req, res) => {
   } catch (error) {
     console.error('Google Callback error:', error);
     res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=true`);
+  }
+};
+
+// Admin Adds Doctor (Pre-registration)
+exports.adminAddDoctor = async (req, res) => {
+  const { full_name, email, phone, badge_id } = req.body;
+  if (!full_name || !email || !phone) {
+    return res.status(400).json({ message: 'Please provide full_name, email, and phone' });
+  }
+
+  try {
+    // Auto-create table if missing
+    await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+    
+    // Check if phone already exists
+    const [existing] = await db.query('SELECT * FROM approved_doctors WHERE phone = ?', [phone]);
+    if (existing.length > 0) {
+      return res.status(400).json({ message: 'Doctor with this phone already exists in approved registry' });
+    }
+
+    await db.query(
+      'INSERT INTO approved_doctors (full_name, email, phone, badge_id) VALUES (?, ?, ?, ?)',
+      [full_name, email, phone, badge_id || null]
+    );
+
+    res.status(201).json({ message: 'Doctor successfully added to approved registry' });
+  } catch (error) {
+    console.error('Admin add doctor error:', error);
+    res.status(500).json({ message: 'Server error: ' + error.message });
   }
 };

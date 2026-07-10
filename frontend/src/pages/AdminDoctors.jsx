@@ -70,9 +70,10 @@ const AdminDoctors = () => {
   const handleAddDoctor = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/auth/register', formData);
+      await axios.post('/api/auth/admin/add-doctor', formData);
       setShowForm(false);
       setFormData({ full_name: '', email: '', phone: '', password: '', role: 'Doctor', badge_id: '' });
+      alert('Doctor added to approved registry successfully. They must now register their account using their phone number.');
       fetchDoctors();
     } catch (error) {
       console.error("Error adding doctor:", error);
@@ -100,9 +101,7 @@ const AdminDoctors = () => {
             <input type="text" placeholder="Full Name" required value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} className="input-field" style={{ flex: '1 1 200px' }} />
             <input type="email" placeholder="Email Address" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="input-field" style={{ flex: '1 1 200px' }} />
             <input type="tel" placeholder="Phone Number" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="input-field" style={{ flex: '1 1 150px' }} />
-            {!editDoctorId && (
-              <input type="password" placeholder="Temporary Password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="input-field" style={{ flex: '1 1 150px' }} />
-            )}
+
             <button type="submit" className="btn btn-primary" style={{ flex: '1 1 100%' }}>{editDoctorId ? 'Update Doctor Account' : 'Create Doctor Account'}</button>
             {editDoctorId && (
               <button type="button" className="btn btn-outline" onClick={() => { setEditDoctorId(null); setFormData({ full_name: '', email: '', phone: '', password: '', role: 'Doctor', badge_id: '' }); }} style={{ flex: '1 1 100%' }}>Cancel Edit</button>

@@ -131,7 +131,6 @@ const Register = () => {
             >
               <option value="Patient" style={{ color: 'black' }}>Patient</option>
               <option value="Doctor" style={{ color: 'black' }}>Doctor</option>
-              <option value="Admin" style={{ color: 'black' }}>Admin</option>
             </select>
           </div>
 

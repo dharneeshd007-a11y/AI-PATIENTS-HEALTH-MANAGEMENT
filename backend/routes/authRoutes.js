@@ -31,4 +31,8 @@ router.get('/google/callback', (req, res, next) => {
   })(req, res, next);
 });
 
+// POST /api/auth/admin/add-doctor
+// Only for admin to pre-register a doctor
+router.post('/admin/add-doctor', authController.adminAddDoctor);
+
 module.exports = router;
