@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 import { FcGoogle } from "react-icons/fc";
@@ -7,7 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [portalType, setPortalType] = useState('doctor'); // default to doctor for the requirement focus
+  const [portalType, setPortalType] = useState('patient'); // default to patient portal
   const [isLogin, setIsLogin] = useState(true);
   
   const [formData, setFormData] = useState({
@@ -116,6 +116,8 @@ const Login = () => {
     }
   };
 
+  const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
   const renderGoogleLogin = (role) => (
     <div style={{ textAlign: 'center', marginTop: '1rem', width: '100%' }}>
       {role === 'admin' && (
@@ -125,7 +127,7 @@ const Login = () => {
       )}
       
       <a 
-        href={`/api/auth/google?role=${role}`} 
+        href={`${BACKEND_URL}/api/auth/google?role=${role}`}
         className="google-auth-btn"
         style={{ 
           display: 'flex', 
@@ -188,7 +190,13 @@ const Login = () => {
             marginBottom: '2.5rem',
             paddingTop: '0.5rem'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>≡ƒÅÑ</div>
+            <div style={{ marginBottom: '1rem' }}>
+              <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="52" height="52" rx="14" fill="#1e3a5f"/>
+                <path d="M26 12C18.268 12 12 18.268 12 26s6.268 14 14 14 14-6.268 14-14S33.732 12 26 12zm1.5 20.5h-3v-3h3v3zm0-6h-3v-8h3v8z" fill="#64ffda"/>
+                <path d="M23 22h6v2h-2v6h-2v-6h-2v-2z" fill="white"/>
+              </svg>
+            </div>
             
             <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem', fontWeight: '700', letterSpacing: '0.5px', color: '#ffffff', wordWrap: 'break-word' }}>
               DKD HOSPITAL AI
@@ -310,7 +318,7 @@ const Login = () => {
       
       {/* Static Footer */}
       <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(10, 25, 47, 0.8)', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
-        ┬⌐ 2026 DKD HOSPITAL AI. All Rights Reserved.
+        &copy; 2026 DKD HOSPITAL AI. All Rights Reserved.
       </div>
 
     </div>
