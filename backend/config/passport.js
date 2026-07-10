@@ -44,14 +44,32 @@ const db = require('./db');
           return done(null, user);
         }
 
-        // Check if user is in `approved_doctors` (Pending Registration)
+        // Check if user is in `approved_doctors` (Pending Auto-Registration)
         try {
           const [approvedDoctors] = await db.query('SELECT * FROM approved_doctors WHERE email = ?', [email]);
           if (approvedDoctors.length > 0) {
-            return done(new Error('Please complete your account registration before logging in.'), null);
+            const approved = approvedDoctors[0];
+            
+            // Auto-create the user in the `users` table!
+            const [insertResult] = await db.query(
+              'INSERT INTO users (full_name, email, phone, role, badge_id, google_id) VALUES (?, ?, ?, ?, ?, ?)',
+              [approved.full_name, approved.email, approved.phone, 'Doctor', approved.badge_id || null, profile.id]
+            );
+            
+            const newUser = {
+              id: insertResult.insertId,
+              full_name: approved.full_name,
+              email: approved.email,
+              phone: approved.phone,
+              role: 'Doctor',
+              badge_id: approved.badge_id || null,
+              google_id: profile.id
+            };
+            
+            return done(null, newUser);
           }
         } catch (err) {
-          // Table might not exist yet
+          console.error('Error auto-registering doctor:', err);
         }
 
         return done(new Error('Your email is not registered by the Administrator.'), null);
