@@ -33,32 +33,47 @@ const Login = () => {
 
     const searchParams = new URLSearchParams(location.search);
     const urlError = searchParams.get('error');
+    // URLSearchParams.get() already decodes percent-encoded values once,
+    // so we must NOT call decodeURIComponent() again — it would break the JSON
     const token = searchParams.get('token');
     const userStr = searchParams.get('user');
 
     if (token && userStr) {
       try {
-        const decodedUser = JSON.parse(decodeURIComponent(userStr));
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify({ user: decodedUser }));
-        
-        // Strict redirection based on role
+        // userStr is already decoded by URLSearchParams, parse directly
+        let decodedUser;
+        try {
+          decodedUser = JSON.parse(userStr);
+        } catch {
+          // Fallback: try decoding once more in case of edge-case double encoding
+          decodedUser = JSON.parse(decodeURIComponent(userStr));
+        }
+
+        // Store in SAME format as regular login so ProtectedRoute works correctly
+        localStorage.setItem('user', JSON.stringify({ token: token, user: decodedUser }));
+
+        // Clean the URL so the token doesn't stay visible
+        window.history.replaceState({}, '', window.location.pathname + '#/login');
+
+        // Strict role-based redirect — use replace:true so back button won't return to login
         if (decodedUser.role === 'Admin') {
-          navigate('/admin-dashboard');
+          navigate('/admin-dashboard', { replace: true });
         } else if (decodedUser.role === 'Doctor') {
-          navigate('/doctor-dashboard');
+          navigate('/doctor-dashboard', { replace: true });
         } else {
-          navigate('/patient-dashboard');
+          navigate('/patient-dashboard', { replace: true });
         }
       } catch (err) {
-        console.error("Failed to parse user data", err);
-        setError('Login failed due to invalid data.');
+        console.error('Failed to parse Google OAuth user data:', err);
+        setPortalType('doctor'); // Show doctor portal since that's where they came from
+        setError('Login failed due to a data error. Please try again.');
       }
     } else if (urlError) {
-      if (urlError.includes('Admin')) setPortalType('admin');
-      if (urlError.includes('Doctor') || urlError.includes('registration')) setPortalType('doctor');
-      
-      // Specifically handle the auth failure message requested
+      // Google OAuth errors only happen for Doctor/Admin (patients don't use Google)
+      // So always switch to doctor portal when we have a Google auth error
+      setPortalType('doctor');
+      if (urlError.toLowerCase().includes('admin')) setPortalType('admin');
+
       if (urlError === 'Authentication failed') {
         setError('Google authentication failed. Please try again.');
       } else {
@@ -66,6 +81,7 @@ const Login = () => {
       }
     }
   }, [location, navigate]);
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
