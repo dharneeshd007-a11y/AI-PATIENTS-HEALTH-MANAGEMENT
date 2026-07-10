@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
+import { FcGoogle } from "react-icons/fc";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [portalType, setPortalType] = useState('patient'); // 'admin', 'doctor', 'patient'
+  const [portalType, setPortalType] = useState('doctor'); // default to doctor for the requirement focus
   const [isLogin, setIsLogin] = useState(true);
   
   const [formData, setFormData] = useState({
@@ -21,14 +22,27 @@ const Login = () => {
   const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
-    // Check for error messages from Google OAuth callback
+    // Inject Poppins font if it isn't already in the document
+    if (!document.getElementById('poppins-font')) {
+      const link = document.createElement('link');
+      link.id = 'poppins-font';
+      link.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap';
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+    }
+
     const searchParams = new URLSearchParams(location.search);
     const urlError = searchParams.get('error');
     if (urlError) {
-      // Decode and display error, switch to appropriate portal if we can guess
       if (urlError.includes('Admin')) setPortalType('admin');
       if (urlError.includes('Doctor') || urlError.includes('registration')) setPortalType('doctor');
-      setError(urlError);
+      
+      // Specifically handle the auth failure message requested
+      if (urlError === 'Authentication failed') {
+        setError('Google authentication failed. Please try again.');
+      } else {
+        setError(urlError);
+      }
     }
   }, [location]);
 
@@ -65,15 +79,10 @@ const Login = () => {
 
     try {
       const payload = {
-        role: portalType === 'doctor' ? 'Doctor' : 'Patient',
-        password: formData.password
+        role: 'Patient', // Only Patient is allowed to register now per requirements
+        password: formData.password,
+        phone: formData.phone
       };
-
-      if (portalType === 'doctor') {
-        payload.email = formData.email;
-      } else {
-        payload.phone = formData.phone;
-      }
 
       await authService.register(payload);
       setSuccessMsg('Registration successful! You can now login.');
@@ -87,153 +96,192 @@ const Login = () => {
   };
 
   const renderGoogleLogin = (role) => (
-    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-        {role === 'admin' 
-          ? "Only the designated Administrator can access this portal." 
-          : "Doctors must use their Google account to sign in."}
-      </p>
+    <div style={{ textAlign: 'center', marginTop: '1rem', width: '100%' }}>
+      {role === 'admin' && (
+        <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+          Only the designated Administrator can access this portal.
+        </p>
+      )}
+      
       <a 
         href="/api/auth/google" 
-        className="btn" 
+        className="google-auth-btn"
         style={{ 
-          display: 'inline-flex', 
+          display: 'flex', 
+          justifyContent: 'center',
           alignItems: 'center', 
-          gap: '10px', 
-          padding: '0.8rem 1.5rem', 
-          backgroundColor: '#fff', 
-          color: '#333', 
-          fontWeight: 'bold', 
-          borderRadius: 'var(--radius-sm)', 
+          gap: '12px', 
+          padding: '1rem 1.5rem', 
+          backgroundColor: '#ffffff', 
+          color: '#1a1a1a', 
+          fontWeight: '600', 
+          borderRadius: '8px', 
           textDecoration: 'none',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          width: '100%',
+          border: '1px solid transparent',
+          transition: 'all 0.3s ease',
+          fontSize: '1rem',
+          boxSizing: 'border-box'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.border = '1px solid #3b82f6';
+          e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.2)';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.border = '1px solid transparent';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+          e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: '20px' }} />
+        <FcGoogle size={24} />
         Continue with Google
       </a>
     </div>
   );
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: '2rem' }}>
-      <div className="glass-card" style={{ width: '100%', maxWidth: '450px' }}>
-        
-        {/* Portal Tabs */}
-        <div style={{ display: 'flex', marginBottom: '2rem', borderBottom: '1px solid var(--glass-border)' }}>
-          <button 
-            onClick={() => { setPortalType('patient'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
-            style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'patient' ? '2px solid var(--accent-cyan)' : 'none', color: portalType === 'patient' ? 'var(--accent-cyan)' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: portalType === 'patient' ? 'bold' : 'normal', fontSize: '0.9rem' }}
-          >
-            Patient Portal
-          </button>
-          <button 
-            onClick={() => { setPortalType('doctor'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
-            style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'doctor' ? '2px solid var(--accent-blue)' : 'none', color: portalType === 'doctor' ? 'var(--accent-blue)' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: portalType === 'doctor' ? 'bold' : 'normal', fontSize: '0.9rem' }}
-          >
-            Doctor Portal
-          </button>
-          <button 
-            onClick={() => { setPortalType('admin'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
-            style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'admin' ? '2px solid var(--accent-purple)' : 'none', color: portalType === 'admin' ? 'var(--accent-purple)' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: portalType === 'admin' ? 'bold' : 'normal', fontSize: '0.9rem' }}
-          >
-            Admin Portal
-          </button>
-        </div>
-
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '1.8rem' }}>
-          {portalType === 'admin' && 'Administrator Login'}
-          {portalType === 'doctor' && (isLogin ? 'Doctor Login' : 'Doctor Registration')}
-          {portalType === 'patient' && (isLogin ? 'Patient Login' : 'Patient Registration')}
-        </h2>
-        
-        {error && (
-          <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--accent-red)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', textAlign: 'center' }}>
-            {error}
-          </div>
-        )}
-
-        {successMsg && (
-          <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--accent-green)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', textAlign: 'center' }}>
-            {successMsg}
-          </div>
-        )}
-
-        {/* ADMIN PORTAL */}
-        {portalType === 'admin' && renderGoogleLogin('admin')}
-
-        {/* DOCTOR PORTAL */}
-        {portalType === 'doctor' && isLogin && renderGoogleLogin('doctor')}
-
-        {portalType === 'doctor' && !isLogin && (
-          <form onSubmit={handleRegistration} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Registered Email</label>
-              <input type="email" name="email" required value={formData.email} onChange={handleChange} className="input-field" placeholder="doctor@hospital.com" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Create Password</label>
-              <input type="password" name="password" required value={formData.password} onChange={handleChange} className="input-field" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Confirm Password</label>
-              <input type="password" name="confirm_password" required value={formData.confirm_password} onChange={handleChange} className="input-field" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }} disabled={loading}>
-              {loading ? 'Registering...' : 'Register Account'}
-            </button>
-          </form>
-        )}
-
-        {/* PATIENT PORTAL */}
-        {portalType === 'patient' && isLogin && (
-          <form onSubmit={handlePatientLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Phone Number</label>
-              <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className="input-field" placeholder="1234567890" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Password</label>
-              <input type="password" name="password" required value={formData.password} onChange={handleChange} className="input-field" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }} disabled={loading}>
-              {loading ? 'Signing In...' : 'Sign In'}
-            </button>
-          </form>
-        )}
-
-        {portalType === 'patient' && !isLogin && (
-          <form onSubmit={handleRegistration} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Registered Phone Number</label>
-              <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} className="input-field" placeholder="1234567890" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Create Password</label>
-              <input type="password" name="password" required value={formData.password} onChange={handleChange} className="input-field" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Confirm Password</label>
-              <input type="password" name="confirm_password" required value={formData.confirm_password} onChange={handleChange} className="input-field" style={{ width: '100%', padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }} />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem', marginTop: '1rem', fontSize: '1.1rem' }} disabled={loading}>
-              {loading ? 'Registering...' : 'Register Account'}
-            </button>
-          </form>
-        )}
-
-        {portalType !== 'admin' && (
-          <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', fontFamily: "'Poppins', sans-serif", backgroundColor: '#0a192f', color: 'white', position: 'relative' }}>
+      
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+        <div style={{ 
+          width: '100%', 
+          maxWidth: '450px', 
+          background: 'rgba(17, 34, 64, 0.7)', 
+          backdropFilter: 'blur(10px)', 
+          borderRadius: '16px', 
+          border: '1px solid rgba(255, 255, 255, 0.1)', 
+          padding: '2.5rem',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+          boxSizing: 'border-box'
+        }}>
+          
+          {/* Portal Tabs */}
+          <div style={{ display: 'flex', marginBottom: '2.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             <button 
-              onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); setFormData({ email: '', phone: '', password: '', confirm_password: '' }); }} 
-              style={{ background: 'none', border: 'none', color: 'var(--accent-blue)', cursor: 'pointer', textDecoration: 'underline' }}
+              onClick={() => { setPortalType('patient'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
+              style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'patient' ? '2px solid #06b6d4' : 'none', color: portalType === 'patient' ? '#06b6d4' : 'rgba(255,255,255,0.6)', cursor: 'pointer', fontWeight: portalType === 'patient' ? '600' : '400', fontSize: '0.9rem', transition: 'all 0.2s', fontFamily: 'inherit' }}
             >
-              {isLogin ? "First time logging in? Register here." : "Already registered? Sign in."}
+              Patient Portal
+            </button>
+            <button 
+              onClick={() => { setPortalType('doctor'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
+              style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'doctor' ? '2px solid #3b82f6' : 'none', color: portalType === 'doctor' ? '#3b82f6' : 'rgba(255,255,255,0.6)', cursor: 'pointer', fontWeight: portalType === 'doctor' ? '600' : '400', fontSize: '0.9rem', transition: 'all 0.2s', fontFamily: 'inherit' }}
+            >
+              Doctor Portal
+            </button>
+            <button 
+              onClick={() => { setPortalType('admin'); setIsLogin(true); setError(''); setSuccessMsg(''); }}
+              style={{ flex: 1, padding: '1rem 0.5rem', background: 'none', border: 'none', borderBottom: portalType === 'admin' ? '2px solid #8b5cf6' : 'none', color: portalType === 'admin' ? '#8b5cf6' : 'rgba(255,255,255,0.6)', cursor: 'pointer', fontWeight: portalType === 'admin' ? '600' : '400', fontSize: '0.9rem', transition: 'all 0.2s', fontFamily: 'inherit' }}
+            >
+              Admin Portal
             </button>
           </div>
-        )}
 
+          {/* EXACT LOGIN CARD HEADER BRANDING */}
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🏥</div>
+            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '700', letterSpacing: '0.5px', color: '#ffffff' }}>
+              DKD HOSPITAL AI
+            </h1>
+            <p style={{ margin: '0.3rem 0 1.5rem 0', fontSize: '0.85rem', color: '#64ffda', fontWeight: '500' }}>
+              AI Powered Hospital Management System
+            </p>
+            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600', color: '#ffffff' }}>
+              Welcome Back
+            </h2>
+            <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+              Sign in to continue
+            </p>
+          </div>
+          
+          {error && (
+            <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              {error}
+            </div>
+          )}
+
+          {successMsg && (
+            <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              {successMsg}
+            </div>
+          )}
+
+          {/* ADMIN PORTAL */}
+          {portalType === 'admin' && renderGoogleLogin('admin')}
+
+          {/* DOCTOR PORTAL */}
+          {/* Strictly only the Google Login button for Doctors */}
+          {portalType === 'doctor' && renderGoogleLogin('doctor')}
+
+          {/* PATIENT PORTAL */}
+          {portalType === 'patient' && isLogin && (
+            <form onSubmit={handlePatientLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', width: '100%', boxSizing: 'border-box' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Phone Number</label>
+                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="1234567890" style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Password</label>
+                <input type="password" name="password" required value={formData.password} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <button type="submit" style={{ width: '100%', padding: '1rem', marginTop: '0.5rem', fontSize: '1rem', fontWeight: '600', backgroundColor: '#06b6d4', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.2s', fontFamily: 'inherit', boxSizing: 'border-box' }} disabled={loading}>
+                {loading ? 'Signing In...' : 'Sign In'}
+              </button>
+            </form>
+          )}
+
+          {portalType === 'patient' && !isLogin && (
+            <form onSubmit={handleRegistration} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', width: '100%', boxSizing: 'border-box' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Registered Phone Number</label>
+                <input type="tel" name="phone" required value={formData.phone} onChange={handleChange} placeholder="1234567890" style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Create Password</label>
+                <input type="password" name="password" required value={formData.password} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Confirm Password</label>
+                <input type="password" name="confirm_password" required value={formData.confirm_password} onChange={handleChange} style={{ width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', fontFamily: 'inherit', boxSizing: 'border-box' }} />
+              </div>
+              <button type="submit" style={{ width: '100%', padding: '1rem', marginTop: '0.5rem', fontSize: '1rem', fontWeight: '600', backgroundColor: '#06b6d4', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.2s', fontFamily: 'inherit', boxSizing: 'border-box' }} disabled={loading}>
+                {loading ? 'Registering...' : 'Register Account'}
+              </button>
+            </form>
+          )}
+
+          {/* Only Patient Portal gets the registration toggle link */}
+          {portalType === 'patient' && (
+            <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+              <button 
+                onClick={() => { setIsLogin(!isLogin); setError(''); setSuccessMsg(''); setFormData({ email: '', phone: '', password: '', confirm_password: '' }); }} 
+                style={{ background: 'none', border: 'none', color: '#06b6d4', cursor: 'pointer', textDecoration: 'none', fontSize: '0.9rem', fontWeight: '500', fontFamily: 'inherit' }}
+              >
+                {isLogin ? "First time logging in? Register here" : "Already registered? Sign in"}
+              </button>
+            </div>
+          )}
+
+        </div>
+        
+        {/* Description requested */}
+        <div style={{ position: 'absolute', top: '2rem', textAlign: 'center', width: '100%' }}>
+          <p style={{ margin: 0, fontSize: '1rem', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>
+            Welcome to DKD HOSPITAL AI
+          </p>
+          <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>
+            Secure, Intelligent & Real-Time Healthcare Platform powered by Artificial Intelligence.
+          </p>
+        </div>
       </div>
+      
+      {/* Static Footer */}
+      <div style={{ textAlign: 'center', padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', backgroundColor: 'rgba(10, 25, 47, 0.8)', color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }}>
+        © 2026 DKD HOSPITAL AI. All Rights Reserved.
+      </div>
+
     </div>
   );
 };
