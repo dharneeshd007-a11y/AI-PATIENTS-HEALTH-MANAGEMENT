@@ -33,7 +33,28 @@ const Login = () => {
 
     const searchParams = new URLSearchParams(location.search);
     const urlError = searchParams.get('error');
-    if (urlError) {
+    const token = searchParams.get('token');
+    const userStr = searchParams.get('user');
+
+    if (token && userStr) {
+      try {
+        const decodedUser = JSON.parse(decodeURIComponent(userStr));
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({ user: decodedUser }));
+        
+        // Strict redirection based on role
+        if (decodedUser.role === 'Admin') {
+          navigate('/admin-dashboard');
+        } else if (decodedUser.role === 'Doctor') {
+          navigate('/doctor-dashboard');
+        } else {
+          navigate('/patient-dashboard');
+        }
+      } catch (err) {
+        console.error("Failed to parse user data", err);
+        setError('Login failed due to invalid data.');
+      }
+    } else if (urlError) {
       if (urlError.includes('Admin')) setPortalType('admin');
       if (urlError.includes('Doctor') || urlError.includes('registration')) setPortalType('doctor');
       
@@ -44,7 +65,7 @@ const Login = () => {
         setError(urlError);
       }
     }
-  }, [location]);
+  }, [location, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -104,7 +125,7 @@ const Login = () => {
       )}
       
       <a 
-        href="/api/auth/google" 
+        href={`/api/auth/google?role=${role}`} 
         className="google-auth-btn"
         style={{ 
           display: 'flex', 

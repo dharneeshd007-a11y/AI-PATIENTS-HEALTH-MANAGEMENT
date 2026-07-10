@@ -12,7 +12,9 @@ const passport = require('passport');
 
 // GET /api/auth/google
 // Initiates the Google OAuth flow
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google', (req, res, next) => {
+  passport.authenticate('google', { scope: ['profile', 'email'], state: req.query.role })(req, res, next);
+});
 
 // GET /api/auth/google/callback
 // Handles the callback from Google
