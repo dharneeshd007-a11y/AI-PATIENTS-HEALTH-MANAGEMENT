@@ -40,8 +40,8 @@ const AdminPatients = () => {
   const [editPatientId, setEditPatientId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ 
-    name: '', age: '', gender: 'Male', phone: '', blood_group: 'A+', address: '', disease: '',
-    patient_type: 'OP', status: 'Pending', mrn: '',
+    name: '', age: '', gender: 'Male', phone: '', 
+    patient_type: 'OP', status: 'Stable', mrn: '',
     room_no: '', bed_no: '', ward: '', assigned_doctor_id: '' 
   });
 
@@ -92,8 +92,8 @@ const AdminPatients = () => {
 
   const resetForm = () => {
     setFormData({ 
-      name: '', age: '', gender: 'Male', phone: '', blood_group: 'A+', address: '', disease: '',
-      patient_type: 'ICU', status: 'Pending', mrn: '',
+      name: '', age: '', gender: 'Male', phone: '', 
+      patient_type: 'ICU', status: 'Stable', mrn: '',
       room_no: '', bed_no: '', ward: '', assigned_doctor_id: '' 
     });
   };
@@ -105,11 +105,8 @@ const AdminPatients = () => {
       age: patient.age,
       gender: patient.gender,
       phone: patient.phone || '',
-      blood_group: patient.blood_group || 'A+',
-      address: patient.address || '',
-      disease: patient.disease || '',
       patient_type: patient.patient_type || 'ICU',
-      status: patient.status || 'Pending',
+      status: patient.status || 'Stable',
       mrn: patient.mrn || '',
       room_no: patient.room_no || '',
       bed_no: patient.bed_no || '',
@@ -183,19 +180,7 @@ const AdminPatients = () => {
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
-            <select value={formData.blood_group} onChange={e => setFormData({...formData, blood_group: e.target.value})} className="input-field" style={{ flex: '1 1 80px' }}>
-              <option value="A+">A+</option>
-              <option value="A-">A-</option>
-              <option value="B+">B+</option>
-              <option value="B-">B-</option>
-              <option value="AB+">AB+</option>
-              <option value="AB-">AB-</option>
-              <option value="O+">O+</option>
-              <option value="O-">O-</option>
-            </select>
             <input type="tel" placeholder="Phone Number" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="input-field" style={{ flex: '1 1 150px' }} />
-            <input type="text" placeholder="Address" required value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="input-field" style={{ flex: '1 1 300px' }} />
-            <input type="text" placeholder="Disease / Condition" required value={formData.disease} onChange={e => setFormData({...formData, disease: e.target.value})} className="input-field" style={{ flex: '1 1 200px' }} />
             
             {/* Classification */}
             <select value={formData.patient_type} onChange={e => setFormData({...formData, patient_type: e.target.value})} className="input-field" style={{ flex: '1 1 120px', fontWeight: 'bold' }}>
@@ -203,7 +188,6 @@ const AdminPatients = () => {
             </select>
 
             <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="input-field" style={{ flex: '1 1 120px' }}>
-              <option value="Pending">Pending</option>
               <option value="Stable">Stable</option>
               <option value="Critical">Critical</option>
               <option value="Recovered">Recovered</option>

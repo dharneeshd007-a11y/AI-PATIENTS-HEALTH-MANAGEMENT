@@ -12,9 +12,7 @@ const passport = require('passport');
 
 // GET /api/auth/google
 // Initiates the Google OAuth flow
-router.get('/google', (req, res, next) => {
-  passport.authenticate('google', { scope: ['profile', 'email'], state: req.query.role })(req, res, next);
-});
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // GET /api/auth/google/callback
 // Handles the callback from Google
@@ -22,6 +20,7 @@ router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', (err, user, info) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     if (err) {
+      // Use /#/login because the frontend uses HashRouter
       return res.redirect(`${frontendUrl}/#/login?error=${encodeURIComponent(err.message)}`);
     }
     if (!user) {
@@ -32,9 +31,5 @@ router.get('/google/callback', (req, res, next) => {
     return authController.googleCallback(req, res);
   })(req, res, next);
 });
-
-// POST /api/auth/admin/add-doctor
-// Only for admin to pre-register a doctor
-router.post('/admin/add-doctor', authController.adminAddDoctor);
 
 module.exports = router;

@@ -1,14 +1,13 @@
+const dotenv = require('dotenv');
+dotenv.config(); // ← MUST be first, before any require() that reads process.env
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 // Database Configuration
 // Run migrations on startup to ensure DB schema is up to date
 require('./migrate')().catch(console.error);
 
 const db = require('./config/db');
-
-// Load environment variables
-dotenv.config();
 
 console.log('--- STARTUP OAUTH CONFIG ---');
 console.log('GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
@@ -37,8 +36,22 @@ const io = new Server(server, {
 
 app.set('io', io); // Make io accessible in routes
 
-// Middleware
-app.use(cors());
+// Middleware — allow Vercel frontend, Render, and localhost
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://ai-patients-health-management.vercel.app',
+  'https://ai-patients-health-management.onrender.com'
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS: Origin not allowed: ' + origin));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
