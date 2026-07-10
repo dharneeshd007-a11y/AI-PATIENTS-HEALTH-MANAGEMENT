@@ -6,39 +6,56 @@ const SECRET_KEY = process.env.JWT_SECRET || 'super_secret_key';
 
 // Register User
 exports.registerUser = async (req, res) => {
-  const { full_name, email, phone, password, role } = req.body;
+  const { email, phone, password, role } = req.body;
   
-  if (!full_name || !email || !phone || !password || !role) {
-    return res.status(400).json({ message: 'Please provide all required fields' });
+  if (!password || !role) {
+    return res.status(400).json({ message: 'Please provide password and role' });
   }
 
-  try {
-    // Check if email exists
-    const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ message: 'Email already registered' });
-    }
+  let final_full_name = '';
+  let final_email = email;
+  let final_phone = phone;
+  let badge_id = req.body.badge_id || null;
 
+  try {
     // If role is Patient, verify they exist in the admin's patient registry
     if (role === 'Patient') {
-      const [patientRecords] = await db.query('SELECT * FROM patients WHERE name = ? AND phone = ?', [full_name, phone]);
+      if (!phone) return res.status(400).json({ message: 'Phone number is required for Patient registration' });
+      const [patientRecords] = await db.query('SELECT * FROM patients WHERE phone = ?', [phone]);
       if (patientRecords.length === 0) {
-        return res.status(400).json({ message: 'Registration denied: You must be added to the hospital registry by an Admin before creating an account. Please verify your Name and Phone Number match your medical record.' });
+        return res.status(400).json({ message: 'Registration denied: Your phone number is not registered by the hospital. Please contact the Administrator.' });
       }
+      final_full_name = patientRecords[0].name;
+      // Patient might not have an email in the patients table, or we can just leave it empty/null
+      final_email = final_email || null;
     }
 
     // If role is Doctor, verify they were added by admin in approved_doctors
     if (role === 'Doctor') {
+      if (!email) return res.status(400).json({ message: 'Email is required for Doctor registration' });
       try {
-        await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+        await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, department VARCHAR(100), specialization VARCHAR(100), badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
       } catch (err) {
         console.warn('Could not create approved_doctors table:', err.message);
       }
       
-      const [doctorRecords] = await db.query('SELECT * FROM approved_doctors WHERE phone = ?', [phone]);
+      const [doctorRecords] = await db.query('SELECT * FROM approved_doctors WHERE email = ?', [email]);
       if (doctorRecords.length === 0) {
-        return res.status(400).json({ message: 'Registration denied: You must be added by an Admin before creating a Doctor account. Please verify your Phone Number.' });
+        return res.status(400).json({ message: 'Registration denied: Your email is not registered by the Administrator.' });
       }
+      final_full_name = doctorRecords[0].full_name;
+      final_phone = doctorRecords[0].phone;
+      badge_id = doctorRecords[0].badge_id;
+    }
+
+    // Check if user already exists
+    if (final_email) {
+      const [existingEmail] = await db.query('SELECT * FROM users WHERE email = ?', [final_email]);
+      if (existingEmail.length > 0) return res.status(400).json({ message: 'Email already registered' });
+    }
+    if (final_phone) {
+      const [existingPhone] = await db.query('SELECT * FROM users WHERE phone = ?', [final_phone]);
+      if (existingPhone.length > 0) return res.status(400).json({ message: 'Phone number already registered' });
     }
 
     // Hash password
@@ -46,10 +63,9 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Insert new user
-    const badge_id = req.body.badge_id || null;
     const [result] = await db.query(
       'INSERT INTO users (full_name, email, phone, password, role, badge_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [full_name, email, phone, hashedPassword, role, badge_id]
+      [final_full_name, final_email, final_phone, hashedPassword, role, badge_id]
     );
 
     res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
@@ -68,26 +84,17 @@ exports.loginUser = async (req, res) => {
   }
 
   try {
-    // Developer/Troubleshooting fallback (Dev Admin & Dev Doctor mapped to phone)
-    if (phone === '7904138308' && password === 'Dharneesh2007') {
-      const token = jwt.sign({ id: 9999, email: 'dharneeshd007@gmail.com', role: 'Admin' }, SECRET_KEY, { expiresIn: '1d' });
-      return res.json({
-        message: 'Login successful', token,
-        user: { id: 9999, full_name: 'DHARNEESH D', email: 'dharneeshd007@gmail.com', phone: '7904138308', role: 'Admin', patient_type: 'OP' }
-      });
-    }
-
     const [users] = await db.query('SELECT * FROM users WHERE phone = ?', [phone]);
     
     if (users.length === 0) {
-      return res.status(401).json({ message: 'Invalid phone number or password.' });
+      return res.status(401).json({ message: 'This phone number is not registered in the Patient List.' });
     }
 
     const user = users[0];
     
-    // Admin login is ONLY allowed via the hardcoded credentials above
-    if (user.role === 'Admin') {
-      return res.status(403).json({ message: 'Admin access denied: Only the master admin can login.' });
+    // Only Patients can login with phone and password
+    if (user.role !== 'Patient') {
+      return res.status(403).json({ message: 'Access denied: Staff must use Google Login.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -177,24 +184,24 @@ exports.googleCallback = async (req, res) => {
 
 // Admin Adds Doctor (Pre-registration)
 exports.adminAddDoctor = async (req, res) => {
-  const { full_name, email, phone, badge_id } = req.body;
-  if (!full_name || !email || !phone) {
-    return res.status(400).json({ message: 'Please provide full_name, email, and phone' });
+  const { full_name, email, phone, department, specialization, badge_id } = req.body;
+  if (!full_name || !email || !phone || !department || !specialization) {
+    return res.status(400).json({ message: 'Please provide full_name, email, phone, department, and specialization' });
   }
 
   try {
     // Auto-create table if missing
-    await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
+    await db.query(`CREATE TABLE IF NOT EXISTS approved_doctors (id INT AUTO_INCREMENT PRIMARY KEY, full_name VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, phone VARCHAR(20) NOT NULL UNIQUE, department VARCHAR(100), specialization VARCHAR(100), badge_id VARCHAR(50), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`);
     
     // Check if phone already exists
-    const [existing] = await db.query('SELECT * FROM approved_doctors WHERE phone = ?', [phone]);
+    const [existing] = await db.query('SELECT * FROM approved_doctors WHERE email = ?', [email]);
     if (existing.length > 0) {
-      return res.status(400).json({ message: 'Doctor with this phone already exists in approved registry' });
+      return res.status(400).json({ message: 'Doctor with this email already exists in approved registry' });
     }
 
     await db.query(
-      'INSERT INTO approved_doctors (full_name, email, phone, badge_id) VALUES (?, ?, ?, ?)',
-      [full_name, email, phone, badge_id || null]
+      'INSERT INTO approved_doctors (full_name, email, phone, department, specialization, badge_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [full_name, email, phone, department, specialization, badge_id || null]
     );
 
     res.status(201).json({ message: 'Doctor successfully added to approved registry' });

@@ -10,34 +10,46 @@ passport.use(new GoogleStrategy({
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      // Check if user already exists based on google_id
-      const [existingUsers] = await db.query('SELECT * FROM users WHERE google_id = ?', [profile.id]);
+      const email = profile.emails[0].value;
       
-      if (existingUsers.length > 0) {
-        const user = existingUsers[0];
-        if (user.role === 'Patient') {
-          return done(new Error('Access Denied. Patients cannot use Google Sign-In.'), null);
-        }
-        return done(null, user);
+      // Admin Check
+      if (email === 'dharneeshd007@gmail.com') {
+        return done(null, { id: 9999, full_name: 'System Admin', email: email, role: 'Admin', phone: '7904138308' });
       }
 
-      // Check if user exists by email
-      const email = profile.emails[0].value;
-      const [usersByEmail] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+      // If user tries to login but they are not the built-in admin, and they are not a registered doctor, we need to handle it.
+      // We don't have the explicit intent (Admin vs Doctor) from the OAuth callback easily, but we can check the tables.
 
+      const [usersByEmail] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
       if (usersByEmail.length > 0) {
         const user = usersByEmail[0];
         if (user.role === 'Patient') {
           return done(new Error('Access Denied. Patients cannot use Google Sign-In.'), null);
         }
-        // If email exists but no google_id, update it
-        await db.query('UPDATE users SET google_id = ? WHERE id = ?', [profile.id, user.id]);
-        user.google_id = profile.id;
+        if (user.role === 'Admin') {
+          // If a fake admin is in the DB, block them. Only the hardcoded email can be admin.
+          return done(new Error('Unauthorized Admin Account.'), null);
+        }
+        // Valid Doctor
+        if (!user.google_id) {
+          await db.query('UPDATE users SET google_id = ? WHERE id = ?', [profile.id, user.id]);
+          user.google_id = profile.id;
+        }
         return done(null, user);
       }
 
-      // If user does not exist in the database at all
-      return done(new Error('Access Denied. Contact the Administrator.'), null);
+      // Check if user is in `approved_doctors` (Pending Registration)
+      try {
+        const [approvedDoctors] = await db.query('SELECT * FROM approved_doctors WHERE email = ?', [email]);
+        if (approvedDoctors.length > 0) {
+          return done(new Error('Please complete your account registration before logging in.'), null);
+        }
+      } catch (err) {
+        // Table might not exist yet
+      }
+
+      // Completely unknown email
+      return done(new Error('Your email is not registered by the Administrator.'), null);
     } catch (err) {
       console.error('Google Strategy Error:', err);
       return done(err, null);

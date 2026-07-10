@@ -86,11 +86,16 @@ router.get('/', async (req, res) => {
 
 // Create a new patient
 router.post('/', async (req, res) => {
-  const { name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
+  const { name, age, gender, blood_group, address, disease, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
   try {
+    // Ensure columns exist
+    try {
+      await db.query('ALTER TABLE patients ADD COLUMN blood_group VARCHAR(10), ADD COLUMN address TEXT, ADD COLUMN disease VARCHAR(255)');
+    } catch (e) { /* ignore if exists */ }
+
     const [result] = await db.query(
-      'INSERT INTO patients (name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [name, age, gender, room, status || 'Stable', mrn, phone || null, doctor_name || null, assigned_doctor_id || null]
+      'INSERT INTO patients (name, age, gender, blood_group, address, disease, room, status, mrn, phone, doctor_name, assigned_doctor_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, age, gender, blood_group || null, address || null, disease || null, room || null, status || 'Pending', mrn || null, phone || null, doctor_name || null, assigned_doctor_id || null]
     );
     
     if (status === 'Critical') {
@@ -98,27 +103,6 @@ router.post('/', async (req, res) => {
         'INSERT INTO alerts (patient_id, arrhythmia_type, severity) VALUES (?, ?, ?)',
         [result.insertId, 'Manual Critical Status Entry', 'Critical']
       );
-    }
-    
-    // Auto-create User account for the patient so they don't have to register
-    if (phone) {
-      try {
-        const bcrypt = require('bcryptjs');
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(phone, salt); // Password is their phone number
-        const fakeEmail = `${phone}@patient.com`;
-        
-        // check if phone already exists in users table
-        const [existing] = await db.query('SELECT id FROM users WHERE phone = ?', [phone]);
-        if (existing.length === 0) {
-          await db.query(
-            'INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)',
-            [name, fakeEmail, phone, hashedPassword, 'Patient']
-          );
-        }
-      } catch (err) {
-        console.error("Auto-user creation failed:", err);
-      }
     }
     
     res.status(201).json({ id: result.insertId, name, age, gender, room, status, mrn });
@@ -130,17 +114,11 @@ router.post('/', async (req, res) => {
 
 // Update a patient
 router.put('/:id', async (req, res) => {
-  const { name, age, gender, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
+  const { name, age, gender, blood_group, address, disease, room, status, mrn, phone, doctor_name, assigned_doctor_id } = req.body;
   try {
     await db.query(
-      'UPDATE patients SET name = ?, age = ?, gender = ?, room = ?, status = ?, mrn = ?, phone = ?, doctor_name = ?, assigned_doctor_id = ? WHERE id = ?',
-      [name, age, gender, room, status, mrn, phone || null, doctor_name || null, assigned_doctor_id || null, req.params.id]
-    );
-
-    // Automatically sync the phone number update to the user's login account if they have one
-    await db.query(
-      "UPDATE users SET phone = ? WHERE full_name = ? AND role = 'Patient'",
-      [phone || null, name]
+      'UPDATE patients SET name = ?, age = ?, gender = ?, blood_group = ?, address = ?, disease = ?, room = ?, status = ?, mrn = ?, phone = ?, doctor_name = ?, assigned_doctor_id = ? WHERE id = ?',
+      [name, age, gender, blood_group || null, address || null, disease || null, room || null, status, mrn || null, phone || null, doctor_name || null, assigned_doctor_id || null, req.params.id]
     );
 
     if (status === 'Critical') {
