@@ -175,10 +175,10 @@ exports.googleCallback = async (req, res) => {
       doctor_id: null
     }));
 
-    res.redirect(`${frontendUrl}/login?token=${token}&user=${userData}`);
+    res.redirect(`${frontendUrl}/#/login?token=${token}&user=${userData}`);
   } catch (error) {
     console.error('Google Callback error:', error);
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=true`);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/login?error=true`);
   }
 };
 

@@ -22,10 +22,10 @@ router.get('/google/callback', (req, res, next) => {
   passport.authenticate('google', (err, user, info) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     if (err) {
-      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(err.message)}`);
+      return res.redirect(`${frontendUrl}/#/login?error=${encodeURIComponent(err.message)}`);
     }
     if (!user) {
-      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
+      return res.redirect(`${frontendUrl}/#/login?error=${encodeURIComponent('Authentication failed')}`);
     }
     // No sessions, just set user on req and pass to controller
     req.user = user;
