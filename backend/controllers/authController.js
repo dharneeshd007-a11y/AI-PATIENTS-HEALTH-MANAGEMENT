@@ -27,9 +27,12 @@ exports.registerUser = async (req, res) => {
       }
     }
 
-    // Check if email exists
-    const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    // Check if email or phone exists
+    const [existingUsers] = await db.query('SELECT * FROM users WHERE email = ? OR phone = ?', [email, phone]);
     if (existingUsers.length > 0) {
+      if (existingUsers.some(u => u.phone === phone)) {
+        return res.status(400).json({ message: 'Phone number already registered. Please sign in instead.' });
+      }
       return res.status(400).json({ message: 'Email already registered' });
     }
 
