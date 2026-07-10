@@ -147,16 +147,53 @@ const Login = () => {
       <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
         <div style={{ 
           width: '100%', 
-          maxWidth: '450px', 
+          maxWidth: '480px', 
           background: 'rgba(17, 34, 64, 0.7)', 
           backdropFilter: 'blur(10px)', 
           borderRadius: '16px', 
           border: '1px solid rgba(255, 255, 255, 0.1)', 
-          padding: '2.5rem',
+          padding: '2.5rem 2rem',
           boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
           boxSizing: 'border-box'
         }}>
           
+          {/* EXACT LOGIN CARD HEADER BRANDING */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'flex-start',
+            textAlign: 'center', 
+            marginBottom: '2.5rem',
+            paddingTop: '0.5rem'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏥</div>
+            
+            <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem', fontWeight: '700', letterSpacing: '0.5px', color: '#ffffff', wordWrap: 'break-word' }}>
+              DKD HOSPITAL AI
+            </h1>
+            
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: '#64ffda', fontWeight: '500' }}>
+              AI Powered Hospital Management System
+            </p>
+
+            <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.3rem', fontWeight: '600', color: '#ffffff' }}>
+              Welcome to DKD HOSPITAL AI
+            </h2>
+
+            <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.4' }}>
+              Secure, Intelligent & Real-Time Healthcare Platform powered by Artificial Intelligence.
+            </p>
+            
+            <h3 style={{ margin: '0 0 0.2rem 0', fontSize: '1.2rem', fontWeight: '600', color: '#ffffff' }}>
+              Welcome Back
+            </h3>
+            
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+              Sign in to continue
+            </p>
+          </div>
+
           {/* Portal Tabs */}
           <div style={{ display: 'flex', marginBottom: '2.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             <button 
@@ -177,23 +214,6 @@ const Login = () => {
             >
               Admin Portal
             </button>
-          </div>
-
-          {/* EXACT LOGIN CARD HEADER BRANDING */}
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🏥</div>
-            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '700', letterSpacing: '0.5px', color: '#ffffff' }}>
-              DKD HOSPITAL AI
-            </h1>
-            <p style={{ margin: '0.3rem 0 1.5rem 0', fontSize: '0.85rem', color: '#64ffda', fontWeight: '500' }}>
-              AI Powered Hospital Management System
-            </p>
-            <h2 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '600', color: '#ffffff' }}>
-              Welcome Back
-            </h2>
-            <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
-              Sign in to continue
-            </p>
           </div>
           
           {error && (
@@ -264,16 +284,6 @@ const Login = () => {
             </div>
           )}
 
-        </div>
-        
-        {/* Description requested */}
-        <div style={{ position: 'absolute', top: '2rem', textAlign: 'center', width: '100%' }}>
-          <p style={{ margin: 0, fontSize: '1rem', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>
-            Welcome to DKD HOSPITAL AI
-          </p>
-          <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>
-            Secure, Intelligent & Real-Time Healthcare Platform powered by Artificial Intelligence.
-          </p>
         </div>
       </div>
       
